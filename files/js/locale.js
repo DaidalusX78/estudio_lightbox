@@ -6,7 +6,7 @@ const LocaleEngine = {
     i18n: {
         en: {
             guide_title: "eStudio Lightbox Guide",
-            slate_byline: "Tap ? for access to the studio guide",
+            guide_eyebrow: "Studio Guide",
             lbl_luminance: "Luminance",
             lbl_tint: "Warm Light Tint",
             lbl_stencil_density: "Outline Density",
@@ -18,7 +18,6 @@ const LocaleEngine = {
             drawer_language: "Language / Idioma",
             drawer_transforms: "Transforms & Canvas",
             btn_rot_90: "Rotate 90°",
-            btn_mask: "Paper Mask",
             btn_flip_h: "Flip Horiz",
             btn_flip_v: "Flip Vert",
             btn_keystone: "Keystone",
@@ -48,7 +47,6 @@ const LocaleEngine = {
 
             c_lock_t: "Touch Lock", c_lock_d: "Freeze to trace",
             c_stencil_t: "Stenciler", c_stencil_d: "Turn into lines",
-            c_mask_t: "Paper Mask", c_mask_d: "A4 / A5 / Letter",
             c_ruler_t: "1:1 Ruler", c_ruler_d: "True screen scale",
             c_camera_t: "Live Camera", c_camera_d: "Trace real world",
 
@@ -77,11 +75,6 @@ const LocaleEngine = {
                     title: "Stenciler / Outline Density",
                     what: "Automatically detects edges in regular photographs and turns them into clean line art with adjustable density.",
                     example: "Turn a realistic photo into a line-art coloring sheet and adjust the density slider to isolate outlines."
-                },
-                mask: {
-                    title: "Standard Paper Margin Mask",
-                    what: "Draws an on-screen aspect boundary for standard physical paper sizes (A4, A5, US Letter, and Square).",
-                    example: "Frame your sketch within the A4 boundary so your drawing never accidentally runs off your physical paper sheet."
                 },
                 ruler: {
                     title: "1:1 Physical Screen Ruler",
@@ -157,7 +150,7 @@ const LocaleEngine = {
         },
         es: {
             guide_title: "Guía eStudio Lightbox",
-            slate_byline: "Toca ? para acceso a la guía de estudio",
+            guide_eyebrow: "Guía de Estudio",
             lbl_luminance: "Luminancia",
             lbl_tint: "Luz Cálida",
             lbl_stencil_density: "Densidad de Línea",
@@ -169,7 +162,6 @@ const LocaleEngine = {
             drawer_language: "Idioma / Language",
             drawer_transforms: "Transformaciones y Lienzo",
             btn_rot_90: "Rotar 90°",
-            btn_mask: "Marco Papel",
             btn_flip_h: "Voltear H",
             btn_flip_v: "Voltear V",
             btn_keystone: "Perspectiva",
@@ -199,7 +191,6 @@ const LocaleEngine = {
 
             c_lock_t: "Bloqueo Táctil", c_lock_d: "Fijar para calcar",
             c_stencil_t: "Plantillas", c_stencil_d: "Convertir a líneas",
-            c_mask_t: "Marco Papel", c_mask_d: "A4 / A5 / Carta",
             c_ruler_t: "Regla 1:1", c_ruler_d: "Escala real en pantalla",
             c_camera_t: "Cámara en Vivo", c_camera_d: "Mundo real",
 
@@ -228,11 +219,6 @@ const LocaleEngine = {
                     title: "Creador de Plantillas (Líneas y Densidad)",
                     what: "Busca los bordes de una foto normal y la convierte en un dibujo de líneas con densidad ajustable.",
                     example: "Convierte una foto en un dibujo de líneas y ajusta el regulador de densidad para aislar los contornos."
-                },
-                mask: {
-                    title: "Marco de Proporción de Papel",
-                    what: "Dibuja un marco en pantalla correspondiente a los formatos físicos estándar (A4, A5, Carta y Cuadrado).",
-                    example: "Encuadra tu dibujo en el marco A4 para asegurarte de que encaja perfectamente en tu folio físico."
                 },
                 ruler: {
                     title: "Regla Física Calibrada 1:1",
@@ -314,7 +300,6 @@ const LocaleEngine = {
         if (btnEn) btnEn.classList.toggle('active', lang === 'en');
         if (btnEs) btnEs.classList.toggle('active', lang === 'es');
 
-        const guideSuffix = lang === 'es' ? 'Guía' : 'Guide';
         const guideTitle = document.getElementById('txt-guide-title');
         if (guideTitle) {
             guideTitle.innerHTML = `
@@ -322,16 +307,7 @@ const LocaleEngine = {
                     <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                     <span class="brand-lightbox">Lightbox</span>
                 </span>
-                <span style="font-weight:400;color:#38bdf8;margin-left:6px;">${guideSuffix}</span>
-            `;
-        }
-
-        const slateByline = document.getElementById('txt-slate-byline');
-        if (slateByline) {
-            slateByline.innerHTML = `
-                <span>${lang === 'es' ? 'Toca' : 'Tap'}</span>
-                <span class="byline-icon">?</span>
-                <span>${lang === 'es' ? 'para acceso a la guía de estudio' : 'for access to the studio guide'}</span>
+                <span class="version-tag">v0.22</span>
             `;
         }
 

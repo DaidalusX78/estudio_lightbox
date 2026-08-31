@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.21</title>
+    <title>eStudio Lightbox - v0.22</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_v0.5.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_v0.5.svg" />
@@ -50,20 +50,13 @@
                     <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                     <span class="brand-lightbox">Lightbox</span>
                 </div>
-                <span class="version-tag">v0.21</span>
             </div>
-            <p class="byline" id="txt-slate-byline">
-                <span>Tap</span>
-                <span class="byline-icon">?</span>
-                <span>for access to the studio guide</span>
-            </p>
         </div>
 
         <div id="image-container">
             <!-- Dynamic Canvas Layers will be placed here -->
         </div>
 
-        <canvas id="mask-canvas"></canvas>
         <canvas id="grid-canvas"></canvas>
         <div id="ruler-overlay"><canvas id="ruler-canvas"></canvas></div>
     </div>
@@ -77,13 +70,16 @@
     <div id="guide-drawer-modal">
         <div class="guide-card-container">
             <div class="guide-drawer-header">
-                <h3 id="txt-guide-title">
-                    <span class="brand-title-wrap" style="font-size:20px;">
-                        <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
-                        <span class="brand-lightbox">Lightbox</span>
-                    </span>
-                    <span style="font-weight:400;color:#38bdf8;margin-left:6px;">Guide</span>
-                </h3>
+                <div class="guide-header-info">
+                    <span class="guide-eyebrow" data-i18n="guide_eyebrow">Studio Guide</span>
+                    <h3 id="txt-guide-title">
+                        <span class="brand-title-wrap" style="font-size:20px;">
+                            <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
+                            <span class="brand-lightbox">Lightbox</span>
+                        </span>
+                        <span class="version-tag">v0.22</span>
+                    </h3>
+                </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
             </div>
 
@@ -105,14 +101,6 @@
                         </div>
                         <span class="title" data-i18n="c_stencil_t">Stenciler</span>
                         <span class="desc" data-i18n="c_stencil_d">Turn into lines</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openCardModal('mask')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_mask_t">Paper Mask</span>
-                        <span class="desc" data-i18n="c_mask_d">A4 / A5 / Letter</span>
                     </div>
 
                     <div class="guide-pill" onclick="openCardModal('ruler')">
@@ -355,14 +343,6 @@
                 <span data-i18n="btn_rot_90">Rotate 90°</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-paper-mask">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
-                </svg>
-                <span data-i18n="btn_mask">Paper Mask</span>
-            </button>
-
             <button class="drawer-action-btn" id="btn-flip-x">
                 <svg viewBox="0 0 24 24">
                     <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
@@ -407,7 +387,7 @@
                 <span data-i18n="btn_tint">Warm Tint</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-invert">
+            <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-invert">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 4.07C7.62 4.07 4.07 7.62 4.07 12S7.62 19.93 12 19.93s7.93-3.55 7.93-7.93S16.38 4.07 12 4.07zm0 13.86V6.07c3.3 0 5.93 2.64 5.93 5.93 0 3.3-2.63 5.93-5.93 5.93z" />
@@ -415,7 +395,7 @@
                 <span data-i18n="btn_invert">Invert</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-contrast">
+            <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-contrast">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.86 0 7-3.14 7-7s-3.14-7-7-7z" />
@@ -423,7 +403,7 @@
                 <span data-i18n="btn_contrast">Contrast</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-camera">
+            <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-camera">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
@@ -431,7 +411,7 @@
                 <span data-i18n="btn_camera">Camera</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-fullscreen">
+            <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-fullscreen">
                 <svg viewBox="0 0 24 24">
                     <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
                 </svg>
@@ -445,7 +425,7 @@
                 <span data-i18n="btn_save">Save to Collection</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-reset">
+            <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-reset">
                 <svg viewBox="0 0 24 24">
                     <path
                         d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />

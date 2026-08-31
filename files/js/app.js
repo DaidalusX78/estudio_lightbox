@@ -251,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-rotate-90')?.addEventListener('click', () => GestureEngine.rotateStep90());
-    document.getElementById('btn-paper-mask')?.addEventListener('click', () => FilterEngine.cyclePaperMask());
 
     document.getElementById('btn-flip-x')?.addEventListener('click', () => {
         const active = LayerManager.getActive();

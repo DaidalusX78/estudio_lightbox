@@ -237,9 +237,9 @@
     }
 
     #toolbar {
-        bottom: 16px;
-        padding: 5px 8px;
-        gap: 4px;
+        bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 16px)));
+        padding: 6px 8px;
+        gap: 5px;
         max-width: calc(100vw - 16px);
     }
 
@@ -272,7 +272,7 @@
     }
 
     #welcome-slate {
-        gap: 10px;
+        gap: 12px;
         transform: translateY(-20px);
     }
 
@@ -285,22 +285,14 @@
     .brand-title-wrap {
         font-size: 38px;
     }
-
-    .version-tag {
-        font-size: 14px;
-    }
-
-    #welcome-slate p.byline {
-        font-size: 13px;
-    }
 }
 
 /* Extra compact optimization for phones <= 420px (Pixel 8, iPhone standard, Galaxy) */
 @media (max-width: 420px) and (orientation: portrait) {
     #toolbar {
-        bottom: 14px;
-        padding: 4px 6px;
-        gap: 3px;
+        bottom: max(22px, calc(14px + env(safe-area-inset-bottom, 14px)));
+        padding: 5px 6px;
+        gap: 4px;
         max-width: calc(100vw - 12px);
     }
 
@@ -318,11 +310,6 @@
         font-size: 15px;
     }
 
-    .divider {
-        margin: 0 1px;
-        height: 18px;
-    }
-
     .btn-lock {
         width: 36px;
         height: 36px;
@@ -334,23 +321,19 @@
     }
 
     .hero-app-logo {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
         max-width: 60vw;
     }
 
     .brand-title-wrap {
-        font-size: 32px;
-    }
-
-    .version-tag {
-        font-size: 13px;
+        font-size: 35px;
     }
 }
 
 @media (max-height: 540px) {
     #toolbar {
-        bottom: 10px;
+        bottom: max(16px, calc(8px + env(safe-area-inset-bottom, 12px)));
         padding: 4px 8px;
         gap: 5px;
         max-width: calc(100vw - 16px);
@@ -382,30 +365,22 @@
     }
 
     #welcome-slate {
-        gap: 6px;
+        gap: 8px;
         transform: translateY(-16px);
     }
 
     .hero-app-logo {
-        width: 130px;
-        height: 130px;
+        width: 140px;
+        height: 140px;
         max-height: 38vh;
     }
 
     .brand-title-wrap {
-        font-size: 28px;
-    }
-
-    .version-tag {
-        font-size: 12px;
-    }
-
-    #welcome-slate p.byline {
-        font-size: 12px;
+        font-size: 22px;
     }
 
     #btn-camera-shutter {
-        bottom: 60px;
+        bottom: 70px;
         width: 48px;
         height: 48px;
     }

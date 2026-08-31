@@ -1,5 +1,5 @@
 // ==========================================
-// MODULE 5: FILTERS, PAPER MASK & GRID ENGINE
+// MODULE 5: FILTERS & GRID ENGINE
 // ==========================================
 const FilterEngine = {
     tintVal: 0,
@@ -8,13 +8,11 @@ const FilterEngine = {
     gridColor: '#38bdf8',
     isGrid: false,
     isRuler: false,
-    paperMaskMode: 0, // 0: None, 1: A4, 2: A5, 3: Letter, 4: Square
 
     init() {
         window.addEventListener('resize', () => {
             if (this.isGrid) this.renderGrid();
             if (this.isRuler) this.renderRuler();
-            if (this.paperMaskMode > 0) this.renderPaperMask();
         });
     },
 
@@ -69,68 +67,6 @@ const FilterEngine = {
             ctx.lineTo(canvas.width, y);
         }
         ctx.stroke();
-    },
-
-    cyclePaperMask() {
-        this.paperMaskMode = (this.paperMaskMode + 1) % 5;
-        this.renderPaperMask();
-        if (navigator.vibrate) navigator.vibrate(20);
-    },
-
-    renderPaperMask() {
-        const canvas = document.getElementById('mask-canvas');
-        const btnPaperMask = document.getElementById('btn-paper-mask');
-        if (!canvas) return;
-
-        if (this.paperMaskMode === 0) {
-            canvas.style.display = 'none';
-            if (btnPaperMask) btnPaperMask.classList.remove('active');
-            return;
-        }
-        canvas.style.display = 'block';
-        if (btnPaperMask) btnPaperMask.classList.add('active');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        let ratio = 1.414;
-        let label = "A4 Margin";
-        if (this.paperMaskMode === 2) { ratio = 1.414; label = "A5 Margin"; }
-        if (this.paperMaskMode === 3) { ratio = 1.294; label = "US Letter"; }
-        if (this.paperMaskMode === 4) { ratio = 1.0; label = "1:1 Square"; }
-
-        let maskW, maskH;
-        if (canvas.width > canvas.height) {
-            maskH = canvas.height * 0.82;
-            maskW = maskH * ratio;
-            if (maskW > canvas.width * 0.9) {
-                maskW = canvas.width * 0.85;
-                maskH = maskW / ratio;
-            }
-        } else {
-            maskW = canvas.width * 0.85;
-            maskH = maskW * ratio;
-            if (maskH > canvas.height * 0.85) {
-                maskH = canvas.height * 0.82;
-                maskW = maskH / ratio;
-            }
-        }
-
-        const x = (canvas.width - maskW) / 2;
-        const y = (canvas.height - maskH) / 2;
-
-        ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.clearRect(x, y, maskW, maskH);
-
-        ctx.strokeStyle = "#38bdf8";
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(x, y, maskW, maskH);
-
-        ctx.fillStyle = "#38bdf8";
-        ctx.font = "11px sans-serif";
-        ctx.fillText(label, x + 8, y + 16);
     },
 
     renderRuler() {

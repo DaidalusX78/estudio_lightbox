@@ -200,6 +200,17 @@
     fill: currentColor;
 }
 
+/* Duplicate buttons hidden in landscape where toolbar displays them directly */
+.portrait-only-drawer-item {
+    display: none !important;
+}
+
+@media (orientation: portrait) {
+    .portrait-only-drawer-item {
+        display: flex !important;
+    }
+}
+
 .lang-switcher {
     display: flex;
     background: var(--bg-card);

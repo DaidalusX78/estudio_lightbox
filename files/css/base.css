@@ -109,9 +109,8 @@ body.dark-mode {
     will-change: transform;
 }
 
-/* Hardware Grid & Paper Mask Canvas */
-#grid-canvas,
-#mask-canvas {
+/* Hardware Grid Canvas */
+#grid-canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -119,10 +118,6 @@ body.dark-mode {
     pointer-events: none;
     display: none;
     z-index: 15;
-}
-
-#mask-canvas {
-    z-index: 14;
 }
 
 /* Calibrated 1:1 Ruler */
@@ -152,7 +147,7 @@ body.dark-mode {
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    gap: 12px;
+    gap: 16px;
     z-index: 5;
     transition: opacity 0.3s ease;
 }
@@ -165,10 +160,10 @@ body.dark-mode {
 }
 
 .hero-app-logo {
-    width: 320px;
-    height: 320px;
-    max-width: 60vw;
-    max-height: 42vh;
+    width: 300px;
+    height: 300px;
+    max-width: 55vw;
+    max-height: 40vh;
     transition: transform 0.25s ease;
 }
 
@@ -185,7 +180,7 @@ body.dark-mode {
     align-items: baseline;
     gap: 2px;
     color: var(--text-dark);
-    font-size: 52px;
+    font-size: 48px;
     line-height: 1;
 }
 
@@ -210,52 +205,12 @@ body.dark-mode .brand-title-wrap {
 }
 
 .version-tag {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 300;
     color: var(--text-muted);
     letter-spacing: 0.02em;
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin-left: 2px;
-    align-self: baseline;
-    opacity: 0.75;
-}
-
-body.dark-mode .version-tag {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    opacity: 0.75;
-}
-
-#welcome-slate p.byline {
-    font-size: 14px;
-    color: var(--text-dim);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-body.dark-mode #welcome-slate p.byline {
-    color: var(--text-muted);
-}
-
-.byline-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    background: rgba(113, 113, 122, 0.15);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent);
-}
-
-body.dark-mode .byline-icon {
-    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.85;
+    margin-left: 6px;
 }
 
 #file-input {
