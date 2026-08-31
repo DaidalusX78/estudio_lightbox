@@ -179,11 +179,16 @@ const LayerManager = {
         return this.layers.find(l => l.id === this.activeId) || this.layers[0] || null;
     },
 
-    setActive(id) {
+    setActive(id, bringToFront = true) {
         this.activeId = id;
+        const container = document.getElementById('image-container');
         this.layers.forEach(l => {
             if (l.element) {
-                l.element.classList.toggle('active-layer', l.id === id);
+                const isActive = l.id === id;
+                l.element.classList.toggle('active-layer', isActive);
+                if (isActive && bringToFront && container && l.element.parentNode === container) {
+                    container.appendChild(l.element);
+                }
             }
         });
         this.syncActiveControls();

@@ -21,6 +21,26 @@ function openCardModal(cardKey) {
     cardDetailModal.style.display = 'flex';
 }
 
+// Video Player Modal helpers
+function openVideoModal() {
+    const modal = document.getElementById('video-player-modal');
+    const video = document.getElementById('intro-video');
+    if (!modal || !video) return;
+    modal.style.display = 'flex';
+    video.currentTime = 0;
+    video.play().catch(e => {});
+}
+
+function closeVideoModal() {
+    const modal = document.getElementById('video-player-modal');
+    const video = document.getElementById('intro-video');
+    if (!modal) return;
+    if (video) {
+        video.pause();
+    }
+    modal.style.display = 'none';
+}
+
 // Clipboard Paste
 async function pasteFromClipboard() {
     try {

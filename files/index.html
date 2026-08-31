@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.23</title>
+    <title>eStudio Lightbox - v0.24</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_v0.5.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_v0.5.svg" />
@@ -51,6 +51,13 @@
                     <span class="brand-lightbox">Lightbox</span>
                 </div>
             </div>
+            <p class="byline" id="txt-slate-byline">
+                <span data-i18n="byline_tap">Tap</span>
+                <span class="byline-icon-svg"><svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" /></svg></span>
+                <span data-i18n="byline_cam">camera or</span>
+                <span class="byline-icon-svg"><svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" /></svg></span>
+                <span data-i18n="byline_paste">paste from clipboard to begin</span>
+            </p>
         </div>
 
         <div id="image-container">
@@ -81,7 +88,7 @@
                             <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                             <span class="brand-lightbox">Lightbox</span>
                         </span>
-                        <span class="version-tag">v0.23</span>
+                        <span class="version-tag">v0.24</span>
                     </h3>
                 </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
@@ -238,8 +245,29 @@
                         <span class="title" data-i18n="c_layers_t">Multi-Layers</span>
                         <span class="desc" data-i18n="c_layers_d">Combine images</span>
                     </div>
+
+                    <div class="guide-pill" onclick="openVideoModal()">
+                        <div class="guide-pill-icon">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                        <span class="title" data-i18n="c_video_t">Animated Intro</span>
+                        <span class="desc" data-i18n="c_video_d">Watch intro video</span>
+                    </div>
                 </div>
             </div>
+            </div>
+
+            <!-- About eStudio Lightbox -->
+            <div class="guide-about-box">
+                <div class="guide-about-header">
+                    <span class="brand-title-wrap" style="font-size:16px;">
+                        <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
+                        <span class="brand-lightbox">Lightbox</span>
+                        <span class="version-tag">v0.24</span>
+                    </span>
+                    <span class="guide-about-creator" data-i18n="about_creator">Created by DaidalusX78 (Marc Bailey)</span>
+                </div>
+                <div data-i18n="about_desc">Precision digital tracing table and drafting suite designed for artists, calligraphers, illustrators, and creators.</div>
             </div>
         </div>
     </div>
@@ -580,6 +608,25 @@
             <div id="library-grid"></div>
             <div class="modal-actions">
                 <button class="btn-cancel" id="btn-close-collection" data-i18n="btn_close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal for Intro Animation -->
+    <div id="video-player-modal" onclick="if(event.target === this) closeVideoModal()">
+        <div class="video-modal-card">
+            <div class="video-modal-header">
+                <h4>
+                    <svg style="width:18px;height:18px;fill:var(--accent);" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span data-i18n="video_modal_title">Animated Intro Sequence</span>
+                </h4>
+                <button class="btn-cancel" onclick="closeVideoModal()" style="padding:6px 12px;">✕</button>
+            </div>
+            <div class="video-wrapper">
+                <video id="intro-video" controls playsinline preload="auto">
+                    <source src="media/estudio_cut1.mp4" type="video/mp4" />
+                    Your browser does not support video playback.
+                </video>
             </div>
         </div>
     </div>

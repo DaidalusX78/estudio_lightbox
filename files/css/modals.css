@@ -102,6 +102,115 @@
     }
 }
 
+@media (orientation: landscape) and (min-width: 900px) {
+    .guide-card-container {
+        max-width: min(920px, 94vw);
+        max-height: calc(100dvh - 80px);
+        padding: 20px 24px;
+        gap: 12px;
+    }
+
+    .guide-sections-grid {
+        gap: 12px;
+    }
+
+    .guide-grid {
+        gap: 8px;
+    }
+
+    .guide-pill {
+        padding: 6px 10px;
+        gap: 8px;
+    }
+}
+
+.guide-about-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.guide-about-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    color: var(--text-heading);
+}
+
+.guide-about-creator {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* --- Video Player Modal --- */
+#video-player-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.video-modal-card {
+    background: var(--bg-glass-modal);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    max-width: 720px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+.video-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.video-modal-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-wrapper video {
+    width: 100%;
+    max-height: 65vh;
+    display: block;
+    outline: none;
+}
+
 .guide-section {
     display: flex;
     flex-direction: column;

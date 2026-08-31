@@ -44,6 +44,7 @@ const LocaleEngine = {
             sec_lighting: "Lighting & Contrast",
             sec_geometry: "Geometry & Alignment",
             sec_media: "Media & Storage",
+            sec_about: "About & Showcase",
 
             c_lock_t: "Touch Lock", c_lock_d: "Freeze to trace",
             c_stencil_t: "Stenciler", c_stencil_d: "Turn into lines",
@@ -64,6 +65,14 @@ const LocaleEngine = {
             c_collection_t: "My Collection", c_collection_d: "Saved library",
             c_save_t: "Save Drawing", c_save_d: "Bookmark canvas",
             c_layers_t: "Multi-Layers", c_layers_d: "Combine images",
+            c_video_t: "Animated Intro", c_video_d: "Watch intro video",
+
+            byline_tap: "Tap",
+            byline_cam: "camera or",
+            byline_paste: "paste from clipboard to begin",
+            about_desc: "Precision digital tracing table and drafting suite designed for artists, calligraphers, illustrators, and creators.",
+            about_creator: "Created by DaidalusX78 (Marc Bailey)",
+            video_modal_title: "Animated Intro Sequence",
 
             cards: {
                 lock: {
@@ -145,6 +154,11 @@ const LocaleEngine = {
                     title: "Multi-Layer System",
                     what: "Manage multiple reference images on screen with independent floating layer chips, opacity, and positioning.",
                     example: "Combine a background landscape with a character outline on separate movable layers."
+                },
+                video: {
+                    title: "Animated Intro Sequence",
+                    what: "Plays the cinematic animated opening video created for eStudio Lightbox.",
+                    example: "Tap to watch the full animated intro video in a high-definition player."
                 }
             }
         },
@@ -188,6 +202,7 @@ const LocaleEngine = {
             sec_lighting: "Luz y Contraste",
             sec_geometry: "Geometría y Ajustes",
             sec_media: "Archivos y Colección",
+            sec_about: "Acerca de y Vídeo",
 
             c_lock_t: "Bloqueo Táctil", c_lock_d: "Fijar para calcar",
             c_stencil_t: "Plantillas", c_stencil_d: "Convertir a líneas",
@@ -208,6 +223,14 @@ const LocaleEngine = {
             c_collection_t: "Mi Colección", c_collection_d: "Librería guardada",
             c_save_t: "Guardar Dibujo", c_save_d: "Marcador local",
             c_layers_t: "Multicapa", c_layers_d: "Combinar imágenes",
+            c_video_t: "Vídeo Animado", c_video_d: "Ver vídeo de apertura",
+
+            byline_tap: "Toca",
+            byline_cam: "cámara o",
+            byline_paste: "pega desde portapapeles para empezar",
+            about_desc: "Mesa de calco digital y herramienta de dibujo de precisión creada para artistas, ilustradores, calígrafos y creadores.",
+            about_creator: "Creado por DaidalusX78 (Marc Bailey)",
+            video_modal_title: "Secuencia Animada de Apertura",
 
             cards: {
                 lock: {
@@ -289,6 +312,11 @@ const LocaleEngine = {
                     title: "Sistema Multicapa",
                     what: "Gestiona múltiples imágenes en pantalla con selectores flotantes, control de opacidad y posición independiente.",
                     example: "Combina un fondo de paisaje con una figura en capas separadas para componer una escena única."
+                },
+                video: {
+                    title: "Secuencia Animada de Apertura",
+                    what: "Reproduce el vídeo de apertura animado creado para eStudio Lightbox.",
+                    example: "Toca para ver el vídeo de introducción completo en alta definición."
                 }
             }
         }
@@ -307,7 +335,7 @@ const LocaleEngine = {
                     <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                     <span class="brand-lightbox">Lightbox</span>
                 </span>
-                <span class="version-tag">v0.23</span>
+                <span class="version-tag">v0.24</span>
             `;
         }
 
