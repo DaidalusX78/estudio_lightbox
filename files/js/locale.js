@@ -307,7 +307,7 @@ const LocaleEngine = {
                     <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                     <span class="brand-lightbox">Lightbox</span>
                 </span>
-                <span class="version-tag">v0.22</span>
+                <span class="version-tag">v0.23</span>
             `;
         }
 

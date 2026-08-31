@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.22</title>
+    <title>eStudio Lightbox - v0.23</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_v0.5.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_v0.5.svg" />
@@ -58,7 +58,11 @@
         </div>
 
         <canvas id="grid-canvas"></canvas>
-        <div id="ruler-overlay"><canvas id="ruler-canvas"></canvas></div>
+        <div id="ruler-overlay">
+            <div id="ruler-corner"><span>mm</span></div>
+            <canvas id="ruler-x-canvas"></canvas>
+            <canvas id="ruler-y-canvas"></canvas>
+        </div>
     </div>
 
     <!-- Floating Multi-Image Selector Bar -->
@@ -77,14 +81,16 @@
                             <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                             <span class="brand-lightbox">Lightbox</span>
                         </span>
-                        <span class="version-tag">v0.22</span>
+                        <span class="version-tag">v0.23</span>
                     </h3>
                 </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
             </div>
 
-            <!-- Category 1: Tracing & Canvas -->
-            <div class="guide-section">
+            <!-- Categories Grid (2-column in landscape) -->
+            <div class="guide-sections-grid">
+                <!-- Category 1: Tracing & Canvas -->
+                <div class="guide-section">
                 <div class="guide-section-title" data-i18n="sec_tracing">Tracing &amp; Canvas</div>
                 <div class="guide-grid">
                     <div class="guide-pill" onclick="openCardModal('lock')">
@@ -233,6 +239,7 @@
                         <span class="desc" data-i18n="c_layers_d">Combine images</span>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>

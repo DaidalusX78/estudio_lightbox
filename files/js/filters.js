@@ -70,36 +70,63 @@ const FilterEngine = {
     },
 
     renderRuler() {
-        const canvas = document.getElementById('ruler-canvas');
         const overlay = document.getElementById('ruler-overlay');
-        if (!canvas || !overlay) return;
+        const xCanvas = document.getElementById('ruler-x-canvas');
+        const yCanvas = document.getElementById('ruler-y-canvas');
+        if (!overlay || !xCanvas || !yCanvas) return;
 
         if (!this.isRuler) {
             overlay.style.display = 'none';
             return;
         }
         overlay.style.display = 'block';
-        canvas.width = window.innerWidth;
-        canvas.height = 30;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#38bdf8";
-        ctx.strokeStyle = "#38bdf8";
-        ctx.font = "10px sans-serif";
 
-        const mmStep = 96 / 25.4;
-        let pos = 0;
-        let count = 0;
-        while (pos < canvas.width) {
-            const isCm = count % 10 === 0;
-            const h = isCm ? 18 : (count % 5 === 0 ? 12 : 6);
-            ctx.beginPath();
-            ctx.moveTo(pos, 0);
-            ctx.lineTo(pos, h);
-            ctx.stroke();
-            if (isCm && count > 0) ctx.fillText(`${count / 10}`, pos + 2, 24);
-            pos += mmStep;
-            count++;
+        const mmStep = 96 / 25.4; // 96 DPI CSS standard to mm
+
+        // 1. Render Top X-Axis Ruler
+        xCanvas.width = Math.max(10, window.innerWidth - 28);
+        xCanvas.height = 28;
+        const xCtx = xCanvas.getContext('2d');
+        xCtx.clearRect(0, 0, xCanvas.width, xCanvas.height);
+        xCtx.fillStyle = "#38bdf8";
+        xCtx.strokeStyle = "#38bdf8";
+        xCtx.font = "9px sans-serif";
+
+        let xPos = 0;
+        let xCount = 0;
+        while (xPos < xCanvas.width) {
+            const isCm = xCount % 10 === 0;
+            const h = isCm ? 15 : (xCount % 5 === 0 ? 9 : 5);
+            xCtx.beginPath();
+            xCtx.moveTo(xPos, 0);
+            xCtx.lineTo(xPos, h);
+            xCtx.stroke();
+            if (isCm && xCount > 0) xCtx.fillText(`${xCount / 10}`, xPos + 2, 23);
+            xPos += mmStep;
+            xCount++;
+        }
+
+        // 2. Render Left Y-Axis Ruler
+        yCanvas.width = 28;
+        yCanvas.height = Math.max(10, window.innerHeight - 28);
+        const yCtx = yCanvas.getContext('2d');
+        yCtx.clearRect(0, 0, yCanvas.width, yCanvas.height);
+        yCtx.fillStyle = "#38bdf8";
+        yCtx.strokeStyle = "#38bdf8";
+        yCtx.font = "9px sans-serif";
+
+        let yPos = 0;
+        let yCount = 0;
+        while (yPos < yCanvas.height) {
+            const isCm = yCount % 10 === 0;
+            const w = isCm ? 15 : (yCount % 5 === 0 ? 9 : 5);
+            yCtx.beginPath();
+            yCtx.moveTo(0, yPos);
+            yCtx.lineTo(w, yPos);
+            yCtx.stroke();
+            if (isCm && yCount > 0) yCtx.fillText(`${yCount / 10}`, 5, yPos + 10);
+            yPos += mmStep;
+            yCount++;
         }
     }
 };

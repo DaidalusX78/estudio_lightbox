@@ -10,6 +10,10 @@ const LayerManager = {
 
     init() {
         this.updateUI();
+        if (this.layers.length === 0) {
+            document.getElementById('btn-paste')?.classList.add('initial-action-glow');
+            document.getElementById('btn-import')?.classList.add('initial-action-glow');
+        }
     },
 
     recordHistory(actionDescription = 'change') {
@@ -68,43 +72,46 @@ const LayerManager = {
 
     updateUndoButton() {
         const btnUndo = document.getElementById('btn-undo');
-        if (!btnUndo) return;
-        if (this.layers.length > 0) {
-            btnUndo.style.display = 'flex';
-            btnUndo.style.opacity = this.historyStack.length > 0 ? '1' : '0.4';
-        } else {
-            btnUndo.style.display = 'none';
+        if (btnUndo) {
+            btnUndo.disabled = this.historyStack.length === 0;
+            btnUndo.style.opacity = this.historyStack.length === 0 ? '0.4' : '1';
         }
     },
 
-    addLayerFromBlob(blob, name = null, stateProps = null, record = true) {
-        if (record) this.recordHistory('add_layer');
-
+    addLayerFromBlob(blob, name = 'Reference') {
+        this.recordHistory('add_layer');
         const reader = new FileReader();
         reader.onload = (e) => {
             const dataUrl = e.target.result;
-            this.createLayer(blob, dataUrl, name, stateProps, true);
+            this.createLayer(blob, dataUrl, name, null, true);
         };
         reader.readAsDataURL(blob);
     },
 
-    createLayer(blob, dataUrl, name = null, stateProps = null, makeActive = true) {
-        const id = 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-        const layerName = name || `Image ${this.nextLayerNum++}`;
+    createLayer(blob, dataUrl, name, stateProps = null, makeActive = true) {
         const container = document.getElementById('image-container');
+        if (!container) return;
 
+        const id = 'layer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        const layerName = name || `Image ${this.nextLayerNum++}`;
         const layerDiv = document.createElement('div');
-        layerDiv.className = 'canvas-layer';
+        layerDiv.className = 'canvas-layer layer-enter';
         layerDiv.id = id;
+
+        // Dismiss action glow when image is added
+        document.getElementById('btn-paste')?.classList.remove('initial-action-glow');
+        document.getElementById('btn-import')?.classList.remove('initial-action-glow');
 
         const img = document.createElement('img');
         img.src = dataUrl;
+        img.draggable = false;
+        layerDiv.appendChild(img);
+
         const canvas = document.createElement('canvas');
         canvas.style.display = 'none';
-
-        layerDiv.appendChild(img);
         layerDiv.appendChild(canvas);
-        if (container) container.appendChild(layerDiv);
+
+        container.appendChild(layerDiv);
 
         const layerObj = {
             id,
@@ -312,8 +319,12 @@ const LayerManager = {
                 if (welcomeSlate) welcomeSlate.style.display = 'flex';
             }
             if (selectorBar) selectorBar.style.display = 'none';
+            document.getElementById('btn-paste')?.classList.add('initial-action-glow');
+            document.getElementById('btn-import')?.classList.add('initial-action-glow');
         } else {
             if (welcomeSlate) welcomeSlate.style.display = 'none';
+            document.getElementById('btn-paste')?.classList.remove('initial-action-glow');
+            document.getElementById('btn-import')?.classList.remove('initial-action-glow');
             if (selectorBar) {
                 selectorBar.style.display = 'flex';
                 selectorBar.innerHTML = '';
