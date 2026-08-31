@@ -73,6 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
         LayerManager.undo();
     });
 
+    // Central Mutual Exclusion Helper for Modals & Drawers
+    const closeAllPopupsAndDrawers = (except = null) => {
+        if (guideDrawerModal && except !== guideDrawerModal) guideDrawerModal.style.display = 'none';
+        if (collectionModal && except !== collectionModal) collectionModal.style.display = 'none';
+        if (overflowDrawer && except !== overflowDrawer) overflowDrawer.style.display = 'none';
+        if (brightnessPopup && except !== brightnessPopup) brightnessPopup.style.display = 'none';
+        if (tintPopup && except !== tintPopup) tintPopup.style.display = 'none';
+        if (gridCustomizerPopup && except !== gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
+        if (keystonePopup && except !== keystonePopup) keystonePopup.style.display = 'none';
+        const cardDetail = document.getElementById('card-detail-modal');
+        if (cardDetail && except !== cardDetail) cardDetail.style.display = 'none';
+    };
+
     // 5. Studio Guide & Modals
     document.getElementById('btn-close-card-modal')?.addEventListener('click', () => {
         if (cardDetailModal) cardDetailModal.style.display = 'none';
@@ -85,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-help')?.addEventListener('click', (e) => {
         e.stopPropagation();
         if (guideDrawerModal) {
-            guideDrawerModal.style.display = guideDrawerModal.style.display === 'flex' ? 'none' : 'flex';
+            const isCurrentlyOpen = guideDrawerModal.style.display === 'flex';
+            closeAllPopupsAndDrawers(guideDrawerModal);
+            guideDrawerModal.style.display = isCurrentlyOpen ? 'none' : 'flex';
         }
     });
 
@@ -135,9 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Collection Modal (IndexedDB)
     document.getElementById('btn-save-collection')?.addEventListener('click', () => StorageModule.saveCurrent());
-    document.getElementById('btn-open-collection')?.addEventListener('click', () => {
+    document.getElementById('btn-open-collection')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         const grid = document.getElementById('library-grid');
         if (!grid || !collectionModal) return;
+        const isCurrentlyOpen = collectionModal.style.display === 'flex';
+        closeAllPopupsAndDrawers(collectionModal);
+        if (isCurrentlyOpen) {
+            collectionModal.style.display = 'none';
+            return;
+        }
         grid.innerHTML = '';
         StorageModule.loadAll((items) => {
             if (!items || items.length === 0) {
@@ -153,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     LayerManager.addLayerFromBlob(item.blob, 'Saved Item');
                     collectionModal.style.display = 'none';
                 };
-                div.querySelector('.library-item-del').onclick = (e) => {
-                    e.stopPropagation();
+                div.querySelector('.library-item-del').onclick = (ev) => {
+                    ev.stopPropagation();
                     StorageModule.deleteItem(item.id, () => document.getElementById('btn-open-collection')?.click());
                 };
                 grid.appendChild(div);
@@ -172,10 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
         FilterEngine.isGrid = !FilterEngine.isGrid;
         document.getElementById('btn-grid')?.classList.toggle('active', FilterEngine.isGrid);
         FilterEngine.renderGrid();
+        closeAllPopupsAndDrawers(gridCustomizerPopup);
         if (gridCustomizerPopup) gridCustomizerPopup.style.display = FilterEngine.isGrid ? 'flex' : 'none';
-        if (brightnessPopup) brightnessPopup.style.display = 'none';
-        if (tintPopup) tintPopup.style.display = 'none';
-        if (keystonePopup) keystonePopup.style.display = 'none';
     });
 
     document.getElementById('grid-size-slider')?.addEventListener('input', (e) => {
@@ -224,11 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-overflow')?.addEventListener('click', (e) => {
         e.stopPropagation();
         if (overflowDrawer) {
-            overflowDrawer.style.display = overflowDrawer.style.display === 'flex' ? 'none' : 'flex';
+            const isCurrentlyOpen = overflowDrawer.style.display === 'flex';
+            closeAllPopupsAndDrawers(overflowDrawer);
+            overflowDrawer.style.display = isCurrentlyOpen ? 'none' : 'flex';
         }
-        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
-        if (brightnessPopup) brightnessPopup.style.display = 'none';
-        if (keystonePopup) keystonePopup.style.display = 'none';
     });
 
     document.getElementById('btn-rotate-90')?.addEventListener('click', () => GestureEngine.rotateStep90());
@@ -257,9 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-keystone-toggle')?.addEventListener('click', (e) => {
         e.stopPropagation();
         if (keystonePopup) {
-            keystonePopup.style.display = keystonePopup.style.display === 'flex' ? 'none' : 'flex';
+            const isCurrentlyOpen = keystonePopup.style.display === 'flex';
+            closeAllPopupsAndDrawers(keystonePopup);
+            keystonePopup.style.display = isCurrentlyOpen ? 'none' : 'flex';
         }
-        if (overflowDrawer) overflowDrawer.style.display = 'none';
     });
 
     document.getElementById('skew-x-slider')?.addEventListener('input', (e) => {
@@ -299,6 +319,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Drawer action duplicates (accessible when hidden from compact mobile bar)
+    document.getElementById('btn-drawer-camera')?.addEventListener('click', () => {
+        document.getElementById('btn-camera')?.click();
+    });
+
+    document.getElementById('btn-drawer-fullscreen')?.addEventListener('click', () => {
+        document.getElementById('btn-fullscreen')?.click();
+    });
+
     document.getElementById('btn-drawer-invert')?.addEventListener('click', () => {
         document.getElementById('btn-invert')?.click();
     });
@@ -318,10 +346,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 11. Brightness & Tint Popups
     document.getElementById('btn-brightness-toggle')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (brightnessPopup) brightnessPopup.style.display = brightnessPopup.style.display === 'flex' ? 'none' : 'flex';
-        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
-        if (tintPopup) tintPopup.style.display = 'none';
-        if (keystonePopup) keystonePopup.style.display = 'none';
+        if (brightnessPopup) {
+            const isCurrentlyOpen = brightnessPopup.style.display === 'flex';
+            closeAllPopupsAndDrawers(brightnessPopup);
+            brightnessPopup.style.display = isCurrentlyOpen ? 'none' : 'flex';
+        }
     });
 
     const updateBrightness = (val, fromInput = false) => {
@@ -361,10 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-tint-toggle')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (tintPopup) tintPopup.style.display = tintPopup.style.display === 'flex' ? 'none' : 'flex';
-        if (brightnessPopup) brightnessPopup.style.display = 'none';
-        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
-        if (overflowDrawer) overflowDrawer.style.display = 'none';
+        if (tintPopup) {
+            const isCurrentlyOpen = tintPopup.style.display === 'flex';
+            closeAllPopupsAndDrawers(tintPopup);
+            tintPopup.style.display = isCurrentlyOpen ? 'none' : 'flex';
+        }
     });
 
     document.getElementById('tint-slider')?.addEventListener('input', (e) => {

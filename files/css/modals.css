@@ -42,6 +42,31 @@
     color: var(--text-primary);
 }
 
+.guide-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.guide-section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.guide-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+}
+
 .guide-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
