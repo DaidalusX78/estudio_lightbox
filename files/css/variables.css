@@ -1,0 +1,31 @@
+:root {
+    /* 1. Accent (Cyan Brand) */
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --accent-glow: rgba(56, 189, 248, 0.15);
+    --accent-soft: rgba(56, 189, 248, 0.12);
+    --accent-focus: rgba(56, 189, 248, 0.35);
+
+    /* 2. Surfaces & Backgrounds */
+    --bg-app: #09090b;
+    --bg-surface: #18181b;
+    --bg-card: #27272a;
+    --bg-card-hover: #323238;
+    --bg-glass: rgba(18, 18, 18, 0.94);
+    --bg-glass-modal: rgba(18, 18, 18, 0.95);
+    --bg-track: #3f3f46;
+
+    /* 3. Borders & Dividers */
+    --border: #27272a;
+    --border-subtle: #3f3f46;
+
+    /* 4. Typography & Icons */
+    --text-primary: #ffffff;
+    --text-heading: #f4f4f5;
+    --text-muted: #a1a1aa;
+    --text-dim: #71717a;
+    --text-dark: #18181b;
+
+    /* 5. Destructive & Alerts */
+    --danger: #ef4444;
+}

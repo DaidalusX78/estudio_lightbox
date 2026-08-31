@@ -1,0 +1,470 @@
+// ==========================================
+// INITIALIZATION & UI BINDINGS
+// ==========================================
+
+// Screen Wake Lock API (keeps screen on while tracing)
+let wakeLock = null;
+async function initWakeLock() {
+    if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { }
+    }
+}
+
+// Modal helper to open card details
+function openCardModal(cardKey) {
+    const cardDetailModal = document.getElementById('card-detail-modal');
+    const data = LocaleEngine.i18n[LocaleEngine.currentLang]?.cards?.[cardKey];
+    if (!data || !cardDetailModal) return;
+    document.getElementById('card-modal-title').innerText = data.title;
+    document.getElementById('card-modal-what').innerText = data.what;
+    document.getElementById('card-modal-example').innerText = data.example;
+    cardDetailModal.style.display = 'flex';
+}
+
+// Clipboard Paste
+async function pasteFromClipboard() {
+    try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+            const imageType = item.types.find(type => type.startsWith('image/'));
+            if (imageType) {
+                const blob = await item.getType(imageType);
+                LayerManager.addLayerFromBlob(blob, `Pasted ${LayerManager.nextLayerNum}`);
+                return;
+            }
+        }
+        alert(LocaleEngine.currentLang === 'es' ? "No se encontró ninguna imagen en el portapapeles." : "No image found on clipboard.");
+    } catch (err) {
+        alert(LocaleEngine.currentLang === 'es' ? "Por favor concede permiso de portapapeles o usa Ctrl+V." : "Please grant clipboard permission or use Ctrl+V.");
+    }
+}
+
+// Main App Lifecycle Bootstrap
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Core Engines
+    StorageModule.init();
+    CameraEngine.init();
+    LayerManager.init();
+    GestureEngine.init();
+    FilterEngine.init();
+    initWakeLock();
+
+    // 2. DOM Elements Cache
+    const guideDrawerModal = document.getElementById('guide-drawer-modal');
+    const cardDetailModal = document.getElementById('card-detail-modal');
+    const collectionModal = document.getElementById('collection-modal');
+    const brightnessPopup = document.getElementById('brightness-popup');
+    const tintPopup = document.getElementById('tint-popup');
+    const gridCustomizerPopup = document.getElementById('grid-customizer-popup');
+    const keystonePopup = document.getElementById('keystone-popup');
+    const overflowDrawer = document.getElementById('overflow-drawer');
+    const fileInput = document.getElementById('file-input');
+    const toolbar = document.getElementById('toolbar');
+    const lockShield = document.getElementById('lock-shield');
+    const unlockPill = document.getElementById('unlock-pill');
+    const unlockProgress = document.getElementById('unlock-progress');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+
+    // 3. Restore Previous Session Layers
+    LayerManager.restoreSession();
+
+    // 4. Undo Button
+    document.getElementById('btn-undo')?.addEventListener('click', () => {
+        LayerManager.undo();
+    });
+
+    // 5. Studio Guide & Modals
+    document.getElementById('btn-close-card-modal')?.addEventListener('click', () => {
+        if (cardDetailModal) cardDetailModal.style.display = 'none';
+    });
+
+    document.getElementById('btn-close-guide')?.addEventListener('click', () => {
+        if (guideDrawerModal) guideDrawerModal.style.display = 'none';
+    });
+
+    document.getElementById('btn-help')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (guideDrawerModal) {
+            guideDrawerModal.style.display = guideDrawerModal.style.display === 'flex' ? 'none' : 'flex';
+        }
+    });
+
+    // 6. Paste & File Import
+    document.getElementById('btn-paste')?.addEventListener('click', pasteFromClipboard);
+
+    window.addEventListener('paste', (e) => {
+        const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+        if (!items) return;
+        for (const item of items) {
+            if (item.type.indexOf('image') !== -1) {
+                LayerManager.addLayerFromBlob(item.getAsFile(), `Pasted ${LayerManager.nextLayerNum}`);
+                break;
+            }
+        }
+    });
+
+    document.getElementById('btn-import')?.addEventListener('click', () => fileInput?.click());
+    fileInput?.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            Array.from(e.target.files).forEach(f => {
+                LayerManager.addLayerFromBlob(f, f.name.replace(/\.[^/.]+$/, ""));
+            });
+        }
+    });
+
+    // Drag & Drop
+    const dragOverlay = document.getElementById('drag-overlay');
+    window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (dragOverlay) dragOverlay.style.display = 'block';
+    });
+    window.addEventListener('dragleave', (e) => {
+        if (e.clientX <= 0 || e.clientY <= 0) {
+            if (dragOverlay) dragOverlay.style.display = 'none';
+        }
+    });
+    window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (dragOverlay) dragOverlay.style.display = 'none';
+        if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+            Array.from(e.dataTransfer.files).forEach(f => {
+                LayerManager.addLayerFromBlob(f, f.name.replace(/\.[^/.]+$/, ""));
+            });
+        }
+    });
+
+    // 7. Collection Modal (IndexedDB)
+    document.getElementById('btn-save-collection')?.addEventListener('click', () => StorageModule.saveCurrent());
+    document.getElementById('btn-open-collection')?.addEventListener('click', () => {
+        const grid = document.getElementById('library-grid');
+        if (!grid || !collectionModal) return;
+        grid.innerHTML = '';
+        StorageModule.loadAll((items) => {
+            if (!items || items.length === 0) {
+                grid.innerHTML = `<div class="empty-library-notice">${LocaleEngine.i18n[LocaleEngine.currentLang].msg_empty_collection}</div>`;
+                return;
+            }
+            items.reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'library-item';
+                const imgUrl = URL.createObjectURL(item.blob);
+                div.innerHTML = `<img src="${imgUrl}" alt="Reference" /><button class="library-item-del">✕</button>`;
+                div.querySelector('img').onclick = () => {
+                    LayerManager.addLayerFromBlob(item.blob, 'Saved Item');
+                    collectionModal.style.display = 'none';
+                };
+                div.querySelector('.library-item-del').onclick = (e) => {
+                    e.stopPropagation();
+                    StorageModule.deleteItem(item.id, () => document.getElementById('btn-open-collection')?.click());
+                };
+                grid.appendChild(div);
+            });
+        });
+        collectionModal.style.display = 'flex';
+    });
+    document.getElementById('btn-close-collection')?.addEventListener('click', () => {
+        if (collectionModal) collectionModal.style.display = 'none';
+    });
+
+    // 8. Grid Controls
+    document.getElementById('btn-grid')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        FilterEngine.isGrid = !FilterEngine.isGrid;
+        document.getElementById('btn-grid')?.classList.toggle('active', FilterEngine.isGrid);
+        FilterEngine.renderGrid();
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = FilterEngine.isGrid ? 'flex' : 'none';
+        if (brightnessPopup) brightnessPopup.style.display = 'none';
+        if (tintPopup) tintPopup.style.display = 'none';
+        if (keystonePopup) keystonePopup.style.display = 'none';
+    });
+
+    document.getElementById('grid-size-slider')?.addEventListener('input', (e) => {
+        FilterEngine.gridSpacing = parseInt(e.target.value);
+        const valElem = document.getElementById('grid-size-val');
+        if (valElem) valElem.innerText = `${FilterEngine.gridSpacing}px`;
+        FilterEngine.renderGrid();
+    });
+
+    document.getElementById('grid-width-slider')?.addEventListener('input', (e) => {
+        FilterEngine.gridLineWidth = parseFloat(e.target.value) / 10;
+        const valElem = document.getElementById('grid-width-val');
+        if (valElem) valElem.innerText = `${FilterEngine.gridLineWidth.toFixed(1)}px`;
+        FilterEngine.renderGrid();
+    });
+
+    // 9. Invert, Contrast, Reset
+    document.getElementById('btn-invert')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('invert');
+        active.isInverted = !active.isInverted;
+        document.body.classList.toggle('dark-mode', active.isInverted);
+        document.getElementById('btn-invert')?.classList.toggle('active', active.isInverted);
+        const dInvert = document.getElementById('btn-drawer-invert');
+        if (dInvert) dInvert.classList.toggle('active', active.isInverted);
+        FilterEngine.update();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-contrast')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('contrast');
+        active.isContrast = !active.isContrast;
+        document.getElementById('btn-contrast')?.classList.toggle('active', active.isContrast);
+        const dContrast = document.getElementById('btn-drawer-contrast');
+        if (dContrast) dContrast.classList.toggle('active', active.isContrast);
+        FilterEngine.update();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-reset')?.addEventListener('click', () => GestureEngine.reset());
+
+    // 10. Overflow Drawer Tools
+    document.getElementById('btn-overflow')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (overflowDrawer) {
+            overflowDrawer.style.display = overflowDrawer.style.display === 'flex' ? 'none' : 'flex';
+        }
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
+        if (brightnessPopup) brightnessPopup.style.display = 'none';
+        if (keystonePopup) keystonePopup.style.display = 'none';
+    });
+
+    document.getElementById('btn-rotate-90')?.addEventListener('click', () => GestureEngine.rotateStep90());
+    document.getElementById('btn-paper-mask')?.addEventListener('click', () => FilterEngine.cyclePaperMask());
+
+    document.getElementById('btn-flip-x')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('flip_x');
+        active.flipX *= -1;
+        document.getElementById('btn-flip-x')?.classList.toggle('active', active.flipX === -1);
+        GestureEngine.requestRender();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-flip-y')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('flip_y');
+        active.flipY *= -1;
+        document.getElementById('btn-flip-y')?.classList.toggle('active', active.flipY === -1);
+        GestureEngine.requestRender();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-keystone-toggle')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (keystonePopup) {
+            keystonePopup.style.display = keystonePopup.style.display === 'flex' ? 'none' : 'flex';
+        }
+        if (overflowDrawer) overflowDrawer.style.display = 'none';
+    });
+
+    document.getElementById('skew-x-slider')?.addEventListener('input', (e) => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        active.skewX = parseInt(e.target.value);
+        const valElem = document.getElementById('skew-x-val');
+        if (valElem) valElem.innerText = `${active.skewX}°`;
+        GestureEngine.requestRender();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('skew-y-slider')?.addEventListener('input', (e) => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        active.skewY = parseInt(e.target.value);
+        const valElem = document.getElementById('skew-y-val');
+        if (valElem) valElem.innerText = `${active.skewY}°`;
+        GestureEngine.requestRender();
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-stencil')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('stencil');
+        active.isStencil = !active.isStencil;
+        document.getElementById('btn-stencil')?.classList.toggle('active', active.isStencil);
+        LayerManager.renderLayer(active);
+        LayerManager.saveSession();
+    });
+
+    document.getElementById('btn-ruler')?.addEventListener('click', () => {
+        FilterEngine.isRuler = !FilterEngine.isRuler;
+        document.getElementById('btn-ruler')?.classList.toggle('active', FilterEngine.isRuler);
+        FilterEngine.renderRuler();
+    });
+
+    // Drawer action duplicates (accessible when hidden from compact mobile bar)
+    document.getElementById('btn-drawer-invert')?.addEventListener('click', () => {
+        document.getElementById('btn-invert')?.click();
+    });
+
+    document.getElementById('btn-drawer-contrast')?.addEventListener('click', () => {
+        document.getElementById('btn-contrast')?.click();
+    });
+
+    document.getElementById('btn-drawer-save')?.addEventListener('click', () => {
+        document.getElementById('btn-save-collection')?.click();
+    });
+
+    document.getElementById('btn-drawer-reset')?.addEventListener('click', () => {
+        document.getElementById('btn-reset')?.click();
+    });
+
+    // 11. Brightness & Tint Popups
+    document.getElementById('btn-brightness-toggle')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (brightnessPopup) brightnessPopup.style.display = brightnessPopup.style.display === 'flex' ? 'none' : 'flex';
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
+        if (tintPopup) tintPopup.style.display = 'none';
+        if (keystonePopup) keystonePopup.style.display = 'none';
+    });
+
+    const updateBrightness = (val, fromInput = false) => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        let num = parseInt(val, 10);
+        if (isNaN(num)) num = 100;
+        num = Math.max(10, Math.min(200, num));
+        active.brightness = num;
+
+        const slider = document.getElementById('brightness-slider');
+        const input = document.getElementById('brightness-input');
+        const valElem = document.getElementById('brightness-val');
+
+        if (slider && fromInput) slider.value = num;
+        if (input && !fromInput) input.value = num;
+        if (valElem) valElem.innerText = `${num}%`;
+
+        FilterEngine.update();
+        LayerManager.saveSession();
+    };
+
+    document.getElementById('brightness-slider')?.addEventListener('input', (e) => {
+        updateBrightness(e.target.value, false);
+    });
+
+    document.getElementById('brightness-input')?.addEventListener('input', (e) => {
+        updateBrightness(e.target.value, true);
+    });
+
+    document.getElementById('brightness-input')?.addEventListener('change', (e) => {
+        const active = LayerManager.getActive();
+        if (active && e.target) {
+            e.target.value = active.brightness;
+        }
+    });
+
+    document.getElementById('btn-tint-toggle')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (tintPopup) tintPopup.style.display = tintPopup.style.display === 'flex' ? 'none' : 'flex';
+        if (brightnessPopup) brightnessPopup.style.display = 'none';
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
+        if (overflowDrawer) overflowDrawer.style.display = 'none';
+    });
+
+    document.getElementById('tint-slider')?.addEventListener('input', (e) => {
+        FilterEngine.tintVal = parseInt(e.target.value);
+        const valElem = document.getElementById('tint-val');
+        if (valElem) valElem.innerText = `${FilterEngine.tintVal}%`;
+        FilterEngine.update();
+    });
+
+    // 12. Fullscreen API
+    const expandIconPath = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z";
+    const collapseIconPath = "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z";
+
+    document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => { });
+        } else {
+            document.exitFullscreen().catch(() => { });
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        const isFullscreen = !!document.fullscreenElement;
+        if (fullscreenIcon) {
+            fullscreenIcon.innerHTML = `<path d="${isFullscreen ? collapseIconPath : expandIconPath}"/>`;
+        }
+        document.getElementById('btn-fullscreen')?.classList.toggle('active', isFullscreen);
+    });
+
+    // 13. Touch Lock Mode with Haptics
+    document.getElementById('btn-lock')?.addEventListener('click', () => {
+        GestureEngine.isLocked = true;
+        if (lockShield) lockShield.style.display = 'block';
+        if (toolbar) toolbar.classList.add('toolbar-locked');
+        if (CameraEngine.shutterBtn) CameraEngine.shutterBtn.style.display = 'none';
+        if (brightnessPopup) brightnessPopup.style.display = 'none';
+        if (tintPopup) tintPopup.style.display = 'none';
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
+        if (keystonePopup) keystonePopup.style.display = 'none';
+        if (overflowDrawer) overflowDrawer.style.display = 'none';
+        if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+    });
+
+    let holdTimer = null;
+    unlockPill?.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (unlockProgress) {
+            unlockProgress.style.width = '100%';
+            unlockProgress.style.transition = 'width 1s linear';
+        }
+        holdTimer = setTimeout(() => {
+            GestureEngine.isLocked = false;
+            if (lockShield) lockShield.style.display = 'none';
+            if (toolbar) toolbar.classList.remove('toolbar-locked');
+            if (CameraEngine.isActive && CameraEngine.shutterBtn) {
+                CameraEngine.shutterBtn.style.display = 'flex';
+            }
+            if (unlockProgress) {
+                unlockProgress.style.transition = 'none';
+                unlockProgress.style.width = '0%';
+            }
+            if (navigator.vibrate) navigator.vibrate(60);
+        }, 1000);
+    });
+
+    const cancelHold = () => {
+        clearTimeout(holdTimer);
+        if (unlockProgress) {
+            unlockProgress.style.transition = 'none';
+            unlockProgress.style.width = '0%';
+        }
+    };
+    unlockPill?.addEventListener('pointerup', cancelHold);
+    unlockPill?.addEventListener('pointerleave', cancelHold);
+    unlockPill?.addEventListener('pointercancel', cancelHold);
+
+    // 14. Click-Outside Popups Dismissal
+    document.addEventListener('click', (e) => {
+        if (guideDrawerModal && guideDrawerModal.style.display === 'flex' && e.target === guideDrawerModal) {
+            guideDrawerModal.style.display = 'none';
+        }
+        if (brightnessPopup && !brightnessPopup.contains(e.target) && e.target.id !== 'btn-brightness-toggle') {
+            brightnessPopup.style.display = 'none';
+        }
+        if (tintPopup && !tintPopup.contains(e.target) && e.target.id !== 'btn-tint-toggle') {
+            tintPopup.style.display = 'none';
+        }
+        if (gridCustomizerPopup && !gridCustomizerPopup.contains(e.target) && e.target.id !== 'btn-grid') {
+            gridCustomizerPopup.style.display = 'none';
+        }
+        if (keystonePopup && !keystonePopup.contains(e.target) && e.target.id !== 'btn-keystone-toggle') {
+            keystonePopup.style.display = 'none';
+        }
+        if (overflowDrawer && !overflowDrawer.contains(e.target) && e.target.id !== 'btn-overflow') {
+            overflowDrawer.style.display = 'none';
+        }
+    });
+
+    // 15. Visibility change wake lock
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') initWakeLock();
+    });
+});

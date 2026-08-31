@@ -1,0 +1,17 @@
+v0.14a
+1) overflow-drawer - Can you fix drawer-action-btn to all be the same size and shape.
+2) Please remove the circular frame from around the hero-app-logo. Also triple the hero-app-logo size
+3) 
+
+
+
+
+
+
+Neon
+
+Layer / ObjectStroke Color (Hex)Stroke Width Blur % Opacity % Purpose
+Top (Core)#ffffff (White) or #f3e5f5 Thin (e.g., 2px) 0% 100%The intense, hot center of the tube.
+Middle (Inner Glow) #d500f9 (Bright Magenta/Purple)Medium (e.g., 5px) 2% – 5% 100% The saturated gas color bleeding out.
+Bottom (Outer Glow) #aa00ff (Deep Purple)Thick (e.g., 15px) 15% – 25% 50% – 70% The ambient light casting onto the wall.
+

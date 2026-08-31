@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
+    <title>eStudio Lightbox - v0.12</title>
+
+    <link rel="manifest"
+        href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22eStudio%20Lightbox%22%2C%22short_name%22%3A%22eStudio%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2309090b%22%2C%22theme_color%22%3A%22%2309090b%22%2C%22orientation%22%3A%22any%22%7D" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            transition: background-color 0.25s ease;
+        }
+
+        body.dark-mode {
+            background-color: #09090b;
+        }
+
+        /* --- Viewport & Canvas Layers --- */
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        #drag-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(56, 189, 248, 0.15);
+            border: 2px dashed #38bdf8;
+            display: none;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        #tint-overlay {
+            position: absolute;
+            inset: 0;
+            background: #ff9800;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 8;
+            mix-blend-mode: multiply;
+            transition: opacity 0.15s ease;
+        }
+
+        #dim-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.05s ease;
+        }
+
+        #image-container {
+            position: absolute;
+            transform-origin: center center;
+            will-change: transform;
+            transform-style: preserve-3d;
+        }
+
+        #trace-image,
+        #stencil-canvas {
+            display: block;
+            max-width: 90vw;
+            max-height: 90vh;
+            pointer-events: none;
+        }
+
+        #stencil-canvas {
+            display: none;
+        }
+
+        #camera-feed {
+            position: absolute;
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        /* Hardware Grid & Paper Mask Canvas */
+        #grid-canvas,
+        #mask-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+            z-index: 15;
+        }
+
+        #mask-canvas {
+            z-index: 14;
+        }
+
+        /* Calibrated 1:1 Ruler */
+        #ruler-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            pointer-events: none;
+            display: none;
+            z-index: 16;
+            background: rgba(0, 0, 0, 0.65);
+            border-bottom: 1px solid #38bdf8;
+        }
+
+        /* --- Minimalist Launch Slate --- */
+        #welcome-slate {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 20;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            padding: 20px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        #welcome-slate h2 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #18181b;
+        }
+
+        body.dark-mode #welcome-slate h2 {
+            color: #f4f4f5;
+        }
+
+        .version-tag {
+            font-size: 14px;
+            font-weight: 300;
+            color: #71717a;
+            letter-spacing: 0.02em;
+        }
+
+        #welcome-slate p.byline {
+            font-size: 14px;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #welcome-slate .byline-icon {
+            width: 18px;
+            height: 18px;
+            fill: #38bdf8;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* --- Glassmorphic Studio Guide Drawer Modal --- */
+        #guide-drawer-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(8px);
+            z-index: 250;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .guide-card-container {
+            background: rgba(24, 24, 27, 0.98);
+            border: 1px solid #3f3f46;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+            color: #fff;
+        }
+
+        .guide-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #27272a;
+            padding-bottom: 12px;
+        }
+
+        .guide-drawer-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            width: 100%;
+        }
+
+        .guide-pill {
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            padding: 14px 10px;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .guide-pill:hover,
+        .guide-pill:active {
+            transform: scale(0.97);
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .guide-pill-icon {
+            color: #38bdf8;
+            display: flex;
+        }
+
+        .guide-pill-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .guide-pill span.title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f4f4f5;
+        }
+
+        .guide-pill span.desc {
+            font-size: 11px;
+            line-height: 1.25;
+            color: #a1a1aa;
+        }
+
+        /* --- Floating Sliders & Popups --- */
+        .slider-popup {
+            position: fixed;
+            bottom: 84px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 27, 0.96);
+            backdrop-filter: blur(16px);
+            border: 1px solid #3f3f46;
+            border-radius: 20px;
+            padding: 12px 18px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 13px;
+            z-index: 110;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .slider-popup input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 130px;
+            height: 6px;
+            background: #3f3f46;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .slider-popup input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+        }
+
+        /* Multi-Row Panels (Grid & Keystone) */
+        .panel-popup {
+            flex-direction: column;
+            gap: 10px;
+            min-width: 260px;
+        }
+
+        .customizer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+            font-size: 12px;
+            color: #a1a1aa;
+        }
+
+        .color-preset-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #3f3f46;
+            cursor: pointer;
+        }
+
+        .color-dot.active {
+            border-color: #ffffff;
+            transform: scale(1.15);
+        }
+
+        /* --- Responsive Non-Clipping Toolbar --- */
+        #toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(18, 18, 18, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 6px 10px;
+            border-radius: 32px;
+            border: 1px solid #27272a;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+            z-index: 100;
+            max-width: calc(100vw - 24px);
+            overflow-x: auto;
+            scrollbar-width: none;
+            transition: opacity 0.25s ease, filter 0.25s ease;
+        }
+
+        #toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        #toolbar.toolbar-locked {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(40%);
+        }
+
+        .btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn.active {
+            color: #38bdf8;
+        }
+
+        .btn svg {
+            width: 19px;
+            height: 19px;
+            fill: currentColor;
+        }
+
+        .divider {
+            width: 1px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 2px;
+            flex-shrink: 0;
+        }
+
+        .icon-import-rotated {
+            transform: rotate(180deg);
+        }
+
+        .btn-lock {
+            background: #38bdf8;
+            color: #000000;
+            border-radius: 18px;
+            padding: 6px 12px;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .mobile-hide {
+                display: none !important;
+            }
+        }
+
+        /* --- Overflow Side Drawer --- */
+        #overflow-drawer {
+            position: fixed;
+            bottom: 84px;
+            right: 16px;
+            background: rgba(24, 24, 27, 0.98);
+            backdrop-filter: blur(16px);
+            border: 1px solid #3f3f46;
+            border-radius: 20px;
+            padding: 14px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 120;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            width: 250px;
+            color: #fff;
+        }
+
+        .drawer-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #a1a1aa;
+            margin-bottom: 2px;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+            background: #27272a;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .lang-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .lang-btn.active {
+            background: #38bdf8;
+            color: #000;
+        }
+
+        .drawer-grid-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .drawer-action-btn {
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .drawer-action-btn.active {
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .drawer-action-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* --- Touch-Lock Shield --- */
+        #lock-shield {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            touch-action: none;
+        }
+
+        #unlock-pill {
+            position: absolute;
+            bottom: 84px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.88);
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 12px 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            pointer-events: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        #unlock-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0%;
+            background: rgba(56, 189, 248, 0.45);
+            z-index: -1;
+        }
+
+        /* --- Generic Modal Cards --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: transparent;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: rgba(24, 24, 27, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid #3f3f46;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 480px;
+            padding: 18px 20px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 85vh;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            pointer-events: auto;
+        }
+
+        .modal-card h3 {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+        }
+
+        .search-bar-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .modal-card input[type="text"] {
+            flex: 1;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .modal-card input[type="text"]:focus {
+            border-color: #38bdf8;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .btn-action {
+            background: #38bdf8;
+            border: none;
+            color: #000;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-cancel {
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .card-detail-section {
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-detail-section h5 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #a1a1aa;
+        }
+
+        .card-detail-section p {
+            font-size: 13px;
+            color: #ffffff;
+            line-height: 1.45;
+        }
+
+        #library-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+
+        .library-item {
+            position: relative;
+            background: #18181b;
+            border: 2px solid #3f3f46;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.15s;
+        }
+
+        .library-item:hover {
+            border-color: #38bdf8;
+            transform: scale(1.02);
+        }
+
+        .library-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .library-item-del {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ef4444;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="viewport">
+        <div id="tint-overlay"></div>
+        <div id="dim-overlay"></div>
+        <div id="drag-overlay"></div>
+        <video id="camera-feed" autoplay playsinline></video>
+
+        <div id="welcome-slate">
+            <div class="title-row">
+                <h2>eStudio Lightbox</h2>
+                <span class="version-tag">v0.12</span>
+            </div>
+            <p class="byline" id="txt-slate-byline">
+                <span>Tap</span>
+                <svg class="byline-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z" />
+                </svg>
+                <span>for studio guide &amp; shortcuts</span>
+            </p>
+        </div>
+
+        <div id="image-container">
+            <img id="trace-image" src="" alt="" style="display: none;" />
+            <canvas id="stencil-canvas"></canvas>
+        </div>
+
+        <canvas id="mask-canvas"></canvas>
+        <canvas id="grid-canvas"></canvas>
+        <div id="ruler-overlay"><canvas id="ruler-canvas"></canvas></div>
+    </div>
+
+    <div id="guide-drawer-modal">
+        <div class="guide-card-container">
+            <div class="guide-drawer-header">
+                <h3 id="txt-guide-title">
+                    <svg style="width:20px;height:20px;fill:#38bdf8;" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z" />
+                    </svg>
+                    eStudio Lightbox Guide
+                </h3>
+                <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
+            </div>
+
+            <div class="guide-grid">
+                <div class="guide-pill" onclick="openCardModal('paste')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_paste_t">Paste</span>
+                    <span class="desc" data-i18n="c_paste_d">From clipboard</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('search')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_search_t">Web Search</span>
+                    <span class="desc" data-i18n="c_search_d">Find references</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('collection')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_collection_t">My Collection</span>
+                    <span class="desc" data-i18n="c_collection_d">Saved library</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('camera')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_camera_t">Live Camera</span>
+                    <span class="desc" data-i18n="c_camera_d">Trace real world</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('import')">
+                    <div class="guide-pill-icon"><svg class="icon-import-rotated" viewBox="0 0 24 24">
+                            <path
+                                d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_import_t">Import File</span>
+                    <span class="desc" data-i18n="c_import_d">Open photo / SVG</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('grid')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_grid_t">Custom Grid</span>
+                    <span class="desc" data-i18n="c_grid_d">Scale &amp; line rules</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('mask')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_mask_t">Paper Mask</span>
+                    <span class="desc" data-i18n="c_mask_d">A4 / A5 / Letter</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('stencil')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_stencil_t">Stenciler</span>
+                    <span class="desc" data-i18n="c_stencil_d">Turn into lines</span>
+                </div>
+
+                <div class="guide-pill" onclick="openCardModal('lock')">
+                    <div class="guide-pill-icon"><svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z" />
+                        </svg></div>
+                    <span class="title" data-i18n="c_lock_t">Touch Lock</span>
+                    <span class="desc" data-i18n="c_lock_d">Freeze to trace</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slider-popup" id="brightness-popup">
+        <span data-i18n="lbl_luminance">Luminance</span>
+        <input type="range" id="brightness-slider" min="10" max="200" value="100" />
+        <span id="brightness-val">100%</span>
+    </div>
+
+    <div class="slider-popup" id="tint-popup">
+        <span data-i18n="lbl_tint">Warm Light</span>
+        <input type="range" id="tint-slider" min="0" max="80" value="0" />
+        <span id="tint-val">0%</span>
+    </div>
+
+    <div class="slider-popup" id="stencil-popup">
+        <span data-i18n="lbl_stencil_density">Outline Density</span>
+        <input type="range" id="stencil-slider" min="15" max="110" value="55" />
+        <span id="stencil-val">55</span>
+    </div>
+
+    <div class="slider-popup panel-popup" id="grid-customizer-popup">
+        <div class="customizer-row">
+            <span data-i18n="lbl_grid_size">Grid Spacing</span>
+            <input type="range" id="grid-size-slider" min="15" max="120" value="40" />
+            <span id="grid-size-val">40px</span>
+        </div>
+        <div class="customizer-row">
+            <span data-i18n="lbl_grid_width">Line Weight</span>
+            <input type="range" id="grid-width-slider" min="5" max="30" value="10" />
+            <span id="grid-width-val">1.0px</span>
+        </div>
+        <div class="customizer-row">
+            <span data-i18n="lbl_grid_color">Color Preset</span>
+            <div class="color-preset-row">
+                <div class="color-dot active" style="background:#38bdf8;"
+                    onclick="FilterEngine.setGridColor('#38bdf8', this)"></div>
+                <div class="color-dot" style="background:#71717a;" onclick="FilterEngine.setGridColor('#71717a', this)">
+                </div>
+                <div class="color-dot" style="background:#ffffff;" onclick="FilterEngine.setGridColor('#ffffff', this)">
+                </div>
+                <div class="color-dot" style="background:#ef4444;" onclick="FilterEngine.setGridColor('#ef4444', this)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slider-popup panel-popup" id="keystone-popup">
+        <div class="customizer-row">
+            <span data-i18n="lbl_skew_x">Tilt Horizontal</span>
+            <input type="range" id="skew-x-slider" min="-30" max="30" value="0" />
+            <span id="skew-x-val">0°</span>
+        </div>
+        <div class="customizer-row">
+            <span data-i18n="lbl_skew_y">Tilt Vertical</span>
+            <input type="range" id="skew-y-slider" min="-30" max="30" value="0" />
+            <span id="skew-y-val">0°</span>
+        </div>
+    </div>
+
+    <div id="overflow-drawer">
+        <div class="drawer-section-title" data-i18n="drawer_language">Language / Idioma</div>
+        <div class="lang-switcher">
+            <button class="lang-btn active" id="btn-lang-en" onclick="LocaleEngine.setLanguage('en')">🇬🇧
+                English</button>
+            <button class="lang-btn" id="btn-lang-es" onclick="LocaleEngine.setLanguage('es')">🇪🇸 Español</button>
+        </div>
+
+        <div class="drawer-section-title" style="margin-top: 4px;" data-i18n="drawer_transforms">Transforms &amp; Canvas
+        </div>
+        <div class="drawer-grid-actions">
+            <button class="drawer-action-btn" id="btn-rotate-90">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03L7.1 18.32zM13 4.07V1L8.45 5.55 13 10V6.09c3.37.5 6 3.41 6 6.91 0 1.28-.35 2.48-.96 3.52l1.46 1.46C20.43 16.38 21 14.76 21 13c0-4.63-3.52-8.43-8-8.93z" />
+                </svg>
+                <span data-i18n="btn_rot_90">Rotate 90°</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-paper-mask">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" />
+                </svg>
+                <span data-i18n="btn_mask">Paper Mask</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-flip-x">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+                </svg>
+                <span data-i18n="btn_flip_h">Flip Horiz</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-flip-y">
+                <svg style="transform: rotate(90deg);" viewBox="0 0 24 24">
+                    <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+                </svg>
+                <span data-i18n="btn_flip_v">Flip Vert</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-keystone-toggle">
+                <svg viewBox="0 0 24 24">
+                    <path d="M21 3L3 6v12l18 3V3zM5 7.63l14-2.33v13.4l-14-2.33V7.63z" />
+                </svg>
+                <span data-i18n="btn_keystone">Keystone</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-stencil">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg>
+                <span data-i18n="btn_stencil">Stenciler</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-ruler">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M21 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H3V6h2v4h2V6h2v2h2V6h2v4h2V6h2v2h2V6h3v12z" />
+                </svg>
+                <span data-i18n="btn_ruler">1:1 Ruler</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-tint-toggle">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                </svg>
+                <span data-i18n="btn_tint">Warm Tint</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="toolbar">
+        <input type="file" id="file-input" accept="image/*,.svg" />
+
+        <button class="btn" id="btn-help" title="Studio Guide" style="color:#38bdf8;">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z" />
+            </svg>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="btn" id="btn-paste" title="Paste Clipboard">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-search-modal" title="Web Search Reference">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-open-collection" title="My Collection">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-import" title="Import File / SVG">
+            <svg class="icon-import-rotated" viewBox="0 0 24 24">
+                <path
+                    d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+            </svg>
+        </button>
+
+        <button class="btn mobile-hide" id="btn-camera" title="Live Camera Feed">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+            </svg>
+        </button>
+
+        <button class="btn mobile-hide" id="btn-save-collection" title="Save to Collection">
+            <svg viewBox="0 0 24 24">
+                <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" />
+            </svg>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="btn" id="btn-grid" title="Custom Grid">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-brightness-toggle" title="Luminance">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+            </svg>
+        </button>
+
+        <button class="btn mobile-hide" id="btn-invert" title="Invert Colors">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 4.07C7.62 4.07 4.07 7.62 4.07 12S7.62 19.93 12 19.93s7.93-3.55 7.93-7.93S16.38 4.07 12 4.07zm0 13.86V6.07c3.3 0 5.93 2.64 5.93 5.93 0 3.3-2.63 5.93-5.93 5.93z" />
+            </svg>
+        </button>
+
+        <button class="btn mobile-hide" id="btn-contrast" title="Contrast Boost">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-fullscreen" title="Full Screen">
+            <svg id="fullscreen-icon" viewBox="0 0 24 24">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+            </svg>
+        </button>
+
+        <button class="btn" id="btn-reset" title="Reset Transforms">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="btn" id="btn-overflow" title="More Tools &amp; Settings">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            </svg>
+        </button>
+
+        <button class="btn btn-lock" id="btn-lock">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z" />
+            </svg>
+            <span data-i18n="btn_lock_text">Lock</span>
+        </button>
+    </div>
+
+    <div id="lock-shield">
+        <div id="unlock-pill">
+            <div id="unlock-progress"></div>
+            <svg style="width:18px;height:18px;fill:currentColor;" viewBox="0 0 24 24">
+                <path
+                    d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z" />
+            </svg>
+            <span data-i18n="txt_unlock_hold">Hold 1s to Unlock</span>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="card-detail-modal">
+        <div class="modal-card">
+            <h3 id="card-modal-title">Tool Guide</h3>
+            <div class="card-detail-section">
+                <h5 data-i18n="modal_what_title">How It Works</h5>
+                <p id="card-modal-what">Description...</p>
+            </div>
+            <div class="card-detail-section">
+                <h5 data-i18n="modal_example_title">Example / When To Use</h5>
+                <p id="card-modal-example">Example...</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-action" id="btn-close-card-modal" data-i18n="btn_got_it">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="collection-modal">
+        <div class="modal-card">
+            <h3 data-i18n="collection_title">My Collection</h3>
+            <div id="library-grid"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-close-collection" data-i18n="btn_close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal-card">
+            <h3 data-i18n="search_title">Search Drawing Reference</h3>
+            <div class="search-bar-row">
+                <input type="text" id="search-input" placeholder="e.g. flower sketch, skull, cartoon..." />
+                <button class="btn-action" id="btn-run-search" data-i18n="btn_search_go">Search</button>
+            </div>
+            <div id="search-status">Searching reference library...</div>
+            <div id="search-results"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btn-cancel-search" data-i18n="btn_close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // MODULE 1: LOCALIZATION & BILINGUAL STRINGS
+        // ==========================================
+        const LocaleEngine = {
+            currentLang: 'en',
+            i18n: {
+                en: {
+                    guide_title: "eStudio Lightbox Guide",
+                    slate_byline: "Tap ? for studio guide & shortcuts",
+                    lbl_luminance: "Luminance",
+                    lbl_tint: "Warm Tint",
+                    lbl_stencil_density: "Outline Density",
+                    lbl_grid_size: "Grid Spacing",
+                    lbl_grid_width: "Line Weight",
+                    lbl_grid_color: "Color Preset",
+                    lbl_skew_x: "Tilt Horizontal",
+                    lbl_skew_y: "Tilt Vertical",
+                    drawer_language: "Language / Idioma",
+                    drawer_transforms: "Transforms & Canvas",
+                    btn_rot_90: "Rotate 90°",
+                    btn_mask: "Paper Mask",
+                    btn_flip_h: "Flip Horiz",
+                    btn_flip_v: "Flip Vert",
+                    btn_keystone: "Keystone",
+                    btn_stencil: "Stenciler",
+                    btn_ruler: "1:1 Ruler",
+                    btn_tint: "Warm Tint",
+                    btn_lock_text: "Lock",
+                    txt_unlock_hold: "Hold 1s to Unlock",
+                    btn_got_it: "Got it",
+                    btn_close: "Close",
+                    search_title: "Search Drawing Reference",
+                    btn_search_go: "Search",
+                    modal_what_title: "How It Works",
+                    modal_example_title: "Example / When To Use",
+                    collection_title: "My Collection",
+                    msg_saved_collection: "Saved to My Collection!",
+                    msg_empty_collection: "No saved images in your collection yet. Tap the bookmark icon on the toolbar to save the current drawing.",
+
+                    c_paste_t: "Paste", c_paste_d: "From clipboard",
+                    c_search_t: "Web Search", c_search_d: "Find references",
+                    c_collection_t: "My Collection", c_collection_d: "Saved library",
+                    c_camera_t: "Live Camera", c_camera_d: "Trace real world",
+                    c_import_t: "Import File", c_import_d: "Open photo / SVG",
+                    c_grid_t: "Custom Grid", c_grid_d: "Scale & line rules",
+                    c_mask_t: "Paper Mask", c_mask_d: "A4 / A5 / Letter",
+                    c_stencil_t: "Stenciler", c_stencil_d: "Turn into lines",
+                    c_lock_t: "Touch Lock", c_lock_d: "Freeze to trace",
+
+                    cards: {
+                        paste: {
+                            title: "Paste from Clipboard",
+                            what: "Grabs any picture you copied from a website or chat and loads it instantly without saving files to your phone.",
+                            example: "Copy an image from Pinterest or Google, open eStudio, and tap Paste to start tracing immediately."
+                        },
+                        search: {
+                            title: "Web Search Reference",
+                            what: "Lets you type what you want to draw and shows public-domain reference drawings directly inside the app.",
+                            example: "Type 'rose sketch' or 'vintage car' and tap any picture to project it onto your screen."
+                        },
+                        collection: {
+                            title: "My Collection (Offline Library)",
+                            what: "Stores your favourite sketches and drawings right inside your device browser memory for quick access anytime, completely offline.",
+                            example: "Save your go-to anatomy templates, coloring sheets, or starter outlines so you can reopen them with a single tap."
+                        },
+                        camera: {
+                            title: "Live Camera Feed",
+                            what: "Turns your phone or tablet camera on so you can see through your screen like a clear pane of glass.",
+                            example: "Place a real leaf, toy, or printed sketch under your tablet to trace its shape onto paper."
+                        },
+                        import: {
+                            title: "Import from Storage (Images & SVGs)",
+                            what: "Opens your device gallery so you can choose your personal photos, downloaded pictures, or scalable vector SVG art.",
+                            example: "Trace a family portrait or a crisp SVG vector line drawing without any pixelation."
+                        },
+                        grid: {
+                            title: "Customizable Overlay Grid",
+                            what: "Renders an adjustable drafting grid over your canvas where you can adjust box spacing, line thickness, and color.",
+                            example: "Use a subtle 20px cyan grid for small lettering, or a bold 80px grid for scaling large portraits."
+                        },
+                        mask: {
+                            title: "Standard Paper Margin Mask",
+                            what: "Draws an on-screen aspect boundary for standard physical paper sizes (A4, A5, US Letter, and Square).",
+                            example: "Frame your sketch within the A4 boundary so your drawing never accidentally runs off your physical paper sheet."
+                        },
+                        stencil: {
+                            title: "Stenciler / Outline Density",
+                            what: "Automatically detects edges in regular photographs and turns them into clean line art with adjustable density.",
+                            example: "Turn a realistic photo into a line-art coloring sheet and adjust the density slider to isolate outlines."
+                        },
+                        lock: {
+                            title: "Touch Lock (Trace Mode)",
+                            what: "Freezes the screen completely so you can lay real paper on the glass and draw without moving the picture.",
+                            example: "Lock the screen, lay your drawing paper on top, and sketch freely. Long-press for 1 second to unlock."
+                        }
+                    }
+                },
+                es: {
+                    guide_title: "Guía eStudio Lightbox",
+                    slate_byline: "Toca ? para abrir la guía y atajos",
+                    lbl_luminance: "Luminancia",
+                    lbl_tint: "Luz Cálida",
+                    lbl_stencil_density: "Densidad de Línea",
+                    lbl_grid_size: "Espaciado de Cuadrícula",
+                    lbl_grid_width: "Grosor de Línea",
+                    lbl_grid_color: "Color de Cuadrícula",
+                    lbl_skew_x: "Inclinación Horizontal",
+                    lbl_skew_y: "Inclinación Vertical",
+                    drawer_language: "Idioma / Language",
+                    drawer_transforms: "Transformaciones y Lienzo",
+                    btn_rot_90: "Rotar 90°",
+                    btn_mask: "Marco Papel",
+                    btn_flip_h: "Voltear H",
+                    btn_flip_v: "Voltear V",
+                    btn_keystone: "Perspectiva",
+                    btn_stencil: "Plantilla",
+                    btn_ruler: "Regla 1:1",
+                    btn_tint: "Luz Cálida",
+                    btn_lock_text: "Bloquear",
+                    txt_unlock_hold: "Mantén 1s para desbloquear",
+                    btn_got_it: "Entendido",
+                    btn_close: "Cerrar",
+                    search_title: "Buscar Bocetos de Referencia",
+                    btn_search_go: "Buscar",
+                    modal_what_title: "Cómo Funciona",
+                    modal_example_title: "Ejemplo / Cuándo Usarlo",
+                    collection_title: "Mi Colección",
+                    msg_saved_collection: "¡Guardado en Mi Colección!",
+                    msg_empty_collection: "Aún no tienes dibujos guardados. Pulsa el icono de marcador en la barra para guardar el dibujo actual.",
+
+                    c_paste_t: "Pegar", c_paste_d: "Portapapeles",
+                    c_search_t: "Búsqueda", c_search_d: "Buscar fotos",
+                    c_collection_t: "Mi Colección", c_collection_d: "Librería guardada",
+                    c_camera_t: "Cámara", c_camera_d: "Mundo real",
+                    c_import_t: "Abrir Foto / SVG", c_import_d: "Desde galería",
+                    c_grid_t: "Cuadrícula Pro", c_grid_d: "Ajustar escala",
+                    c_mask_t: "Marco Papel", c_mask_d: "A4 / A5 / Carta",
+                    c_stencil_t: "Plantilla", c_stencil_d: "Convertir a líneas",
+                    c_lock_t: "Bloquear", c_lock_d: "Fijar para calcar",
+
+                    cards: {
+                        paste: {
+                            title: "Pegar desde Portapapeles",
+                            what: "Carga al instante cualquier foto que hayas copiado de internet o de un chat, sin necesidad de guardarla en tu móvil.",
+                            example: "Copia un dibujo en Pinterest o Google, abre eStudio y pulsa Pegar para empezar a calcar al momento."
+                        },
+                        search: {
+                            title: "Buscador de Referencias",
+                            what: "Te permite escribir lo que quieres dibujar y busca ilustraciones y láminas libres de derechos directamente en la app.",
+                            example: "Escribe 'boceto flor' o 'coche clásico' y toca cualquier imagen para proyectarla en tu pantalla."
+                        },
+                        collection: {
+                            title: "Mi Colección (Librería Local)",
+                            what: "Guarda tus dibujos y plantillas favoritos en la memoria de tu dispositivo para abrirlos siempre que quieras, totalmente sin conexión.",
+                            example: "Guarda plantillas de anatomía, láminas de colorear para Elisa o tus diseños favoritos para abrirlos con un solo toque."
+                        },
+                        camera: {
+                            title: "Cámara en Vivo",
+                            what: "Enciende la cámara de tu dispositivo para ver a través de la pantalla como si fuera un cristal transparente.",
+                            example: "Coloca una hoja natural, una figura o un dibujo debajo de la tablet para calcar su silueta sobre papel."
+                        },
+                        import: {
+                            title: "Abrir desde la Galería (Imágenes y SVGs)",
+                            what: "Abre los archivos de tu móvil o tablet para que puedas elegir fotos normales o dibujos vectoriales SVG escalables.",
+                            example: "Calca un retrato familiar o un trazado vectorial SVG sin que pierda nitidez al hacer zoom."
+                        },
+                        grid: {
+                            title: "Cuadrícula Personalizable",
+                            what: "Genera una cuadrícula de dibujo ajustable donde puedes cambiar la separación de las cajas, el grosor de línea y el color.",
+                            example: "Usa una cuadrícula fina de 20px para caligrafía o una de 80px para ampliar retratos a escala."
+                        },
+                        mask: {
+                            title: "Marco de Proporción de Papel",
+                            what: "Dibuja un marco en pantalla correspondiente a los formatos físicos estándar (A4, A5, Carta y Cuadrado).",
+                            example: "Encuadra tu dibujo en el marco A4 para asegurarte de que encaja perfectamente en tu folio físico."
+                        },
+                        stencil: {
+                            title: "Creador de Plantillas (Líneas y Densidad)",
+                            what: "Busca los bordes de una foto normal y la convierte en un dibujo de líneas con densidad ajustable.",
+                            example: "Convierte una foto en un dibujo de líneas y ajusta el regulador de densidad para aislar los contornos."
+                        },
+                        lock: {
+                            title: "Bloqueo Táctil (Modo Calcar)",
+                            what: "Congela la pantalla para que puedas apoyar el papel y tu mano encima sin que la foto se mueva por accidente.",
+                            example: "Bloquea la pantalla, coloca tu folio encima y calca con lápiz. Mantén pulsado 1 segundo para desbloquear."
+                        }
+                    }
+                }
+            },
+            setLanguage(lang) {
+                this.currentLang = lang;
+                document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+                document.getElementById('btn-lang-es').classList.toggle('active', lang === 'es');
+
+                document.getElementById('txt-guide-title').innerHTML = `
+          <svg style="width:20px;height:20px;fill:#38bdf8;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z"/></svg>
+          ${this.i18n[lang].guide_title}
+        `;
+
+                document.getElementById('txt-slate-byline').innerHTML = `
+          <span>${lang === 'es' ? 'Toca' : 'Tap'}</span>
+          <svg class="byline-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .88-.36 1.68-.93 2.25z"/></svg>
+          <span>${lang === 'es' ? 'para abrir la guía y atajos' : 'for studio guide & shortcuts'}</span>
+        `;
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (this.i18n[lang][key]) el.innerText = this.i18n[lang][key];
+                });
+            }
+        };
+
+        // ==========================================
+        // MODULE 2: PERSISTENT STORAGE & STARTER PACK
+        // ==========================================
+        const StorageModule = {
+            db: null,
+            DB_NAME: 'eStudioLightboxDB',
+            STORE_NAME: 'collection',
+            currentBlob: null,
+
+            init() {
+                const request = indexedDB.open(this.DB_NAME, 2);
+                request.onupgradeneeded = (e) => {
+                    this.db = e.target.result;
+                    if (!this.db.objectStoreNames.contains(this.STORE_NAME)) {
+                        this.db.createObjectStore(this.STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                request.onsuccess = (e) => {
+                    this.db = e.target.result;
+                    this.injectStarterPackIfEmpty();
+                };
+            },
+
+            // Starter Templates (Botanical, Anatomy, Mandala, Calligraphy)
+            injectStarterPackIfEmpty() {
+                this.loadAll((items) => {
+                    if (items.length === 0) {
+                        const starterSVGs = [
+                            { name: 'Botanical Leaf', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 20 C40 60 40 140 100 180 C160 140 160 60 100 20 Z M100 20 L100 180 M100 60 L60 80 M100 100 L140 120 M100 140 L60 150" fill="none" stroke="#000" stroke-width="4"/></svg>' },
+                            { name: 'Anatomy Proportions', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><ellipse cx="100" cy="90" rx="55" ry="70" fill="none" stroke="#000" stroke-width="3"/><line x1="100" y1="20" x2="100" y2="160" stroke="#000" stroke-width="1.5" stroke-dasharray="3 3"/><line x1="45" y1="90" x2="155" y2="90" stroke="#000" stroke-width="2"/><line x1="60" y1="120" x2="140" y2="120" stroke="#000" stroke-width="2"/></svg>' },
+                            { name: 'Mandala Geometric', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="75" fill="none" stroke="#000" stroke-width="3"/><circle cx="100" cy="100" r="45" fill="none" stroke="#000" stroke-width="2"/><polygon points="100,25 175,100 100,175 25,100" fill="none" stroke="#000" stroke-width="2"/><polygon points="100,45 155,100 100,155 45,100" fill="none" stroke="#000" stroke-width="1.5"/></svg>' },
+                            { name: 'Calligraphy Slant Guide', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><line x1="10" y1="40" x2="190" y2="40" stroke="#000" stroke-width="2"/><line x1="10" y1="80" x2="190" y2="80" stroke="#000" stroke-width="1.5" stroke-dasharray="2 2"/><line x1="10" y1="120" x2="190" y2="120" stroke="#000" stroke-width="2"/><line x1="10" y1="160" x2="190" y2="160" stroke="#000" stroke-width="2"/><line x1="40" y1="180" x2="80" y2="20" stroke="#888" stroke-width="1.5"/><line x1="90" y1="180" x2="130" y2="20" stroke="#888" stroke-width="1.5"/><line x1="140" y1="180" x2="180" y2="20" stroke="#888" stroke-width="1.5"/></svg>' }
+                        ];
+
+                        const tx = this.db.transaction([this.STORE_NAME], 'readwrite');
+                        const store = tx.objectStore(this.STORE_NAME);
+                        starterSVGs.forEach(s => {
+                            const blob = new Blob([s.svg], { type: 'image/svg+xml' });
+                            store.add({ blob, timestamp: Date.now() });
+                        });
+                    }
+                });
+            },
+
+            async saveCurrent() {
+                if (!this.currentBlob) {
+                    alert(LocaleEngine.currentLang === 'es' ? 'No hay ninguna imagen cargada en la pantalla.' : 'No image loaded on canvas to save.');
+                    return;
+                }
+
+                const tx = this.db.transaction([this.STORE_NAME], 'readwrite');
+                const store = tx.objectStore(this.STORE_NAME);
+                store.add({
+                    blob: this.currentBlob,
+                    timestamp: Date.now()
+                });
+                tx.oncomplete = () => {
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    alert(LocaleEngine.i18n[LocaleEngine.currentLang].msg_saved_collection);
+                };
+            },
+
+            loadAll(callback) {
+                if (!this.db) return;
+                const tx = this.db.transaction([this.STORE_NAME], 'readonly');
+                const store = tx.objectStore(this.STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => callback(req.result || []);
+            },
+
+            deleteItem(id, callback) {
+                const tx = this.db.transaction([this.STORE_NAME], 'readwrite');
+                const store = tx.objectStore(this.STORE_NAME);
+                store.delete(id);
+                tx.oncomplete = () => callback();
+            }
+        };
+
+        // ==========================================
+        // MODULE 3: GESTURE, KEYSTONE & TRANSFORM ENGINE
+        // ==========================================
+        const GestureEngine = {
+            scale: 1,
+            translateX: 0,
+            translateY: 0,
+            rotation: 0,
+            flipX: 1,
+            flipY: 1,
+            skewX: 0,
+            skewY: 0,
+            isLocked: false,
+            activePointers: new Map(),
+            initialDistance: null,
+            initialAngle: null,
+            startScale: 1,
+            startRotation: 0,
+            lastPanX: 0,
+            lastPanY: 0,
+            rAFScheduled: false,
+
+            init() {
+                const viewport = document.getElementById('viewport');
+
+                viewport.addEventListener('pointerdown', (e) => {
+                    if (this.isLocked) return;
+                    this.activePointers.set(e.pointerId, e);
+                    if (this.activePointers.size === 1) {
+                        this.lastPanX = e.clientX;
+                        this.lastPanY = e.clientY;
+                    } else if (this.activePointers.size === 2) {
+                        const [p1, p2] = Array.from(this.activePointers.values());
+                        this.initialDistance = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+                        this.initialAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+                        this.startScale = this.scale;
+                        this.startRotation = this.rotation;
+                    }
+                });
+
+                viewport.addEventListener('pointermove', (e) => {
+                    if (this.isLocked || !this.activePointers.has(e.pointerId)) return;
+                    this.activePointers.set(e.pointerId, e);
+
+                    if (this.activePointers.size === 1) {
+                        this.translateX += e.clientX - this.lastPanX;
+                        this.translateY += e.clientY - this.lastPanY;
+                        this.lastPanX = e.clientX;
+                        this.lastPanY = e.clientY;
+                        this.requestRender();
+                    } else if (this.activePointers.size === 2) {
+                        const [p1, p2] = Array.from(this.activePointers.values());
+                        const curDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+                        const curAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+
+                        if (this.initialDistance && curDist) {
+                            this.scale = Math.min(Math.max(this.startScale * (curDist / this.initialDistance), 0.15), 12);
+                        }
+                        if (this.initialAngle !== null && curAngle !== null) {
+                            this.rotation = this.startRotation + (curAngle - this.initialAngle);
+                        }
+                        this.requestRender();
+                    }
+                });
+
+                const endPointer = (e) => {
+                    this.activePointers.delete(e.pointerId);
+                    if (this.activePointers.size === 1) {
+                        const rem = Array.from(this.activePointers.values())[0];
+                        this.lastPanX = rem.clientX;
+                        this.lastPanY = rem.clientY;
+                    } else if (this.activePointers.size === 0) {
+                        this.initialDistance = null;
+                        this.initialAngle = null;
+                        this.saveStateToSession();
+                    }
+                };
+
+                viewport.addEventListener('pointerup', endPointer);
+                viewport.addEventListener('pointercancel', endPointer);
+
+                viewport.addEventListener('wheel', (e) => {
+                    if (this.isLocked) return;
+                    e.preventDefault();
+
+                    if (e.shiftKey) {
+                        this.translateX -= e.deltaY;
+                        this.translateY -= e.deltaX;
+                    } else {
+                        const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+                        this.scale = Math.min(Math.max(this.scale * zoomFactor, 0.15), 12);
+                    }
+                    this.requestRender();
+                    this.saveStateToSession();
+                }, { passive: false });
+
+                let lastTap = 0;
+                viewport.addEventListener('click', () => {
+                    if (this.isLocked) return;
+                    const now = Date.now();
+                    if (now - lastTap < 300) this.toggleQuickFit();
+                    lastTap = now;
+                });
+            },
+
+            rotateStep90() {
+                this.rotation = (Math.round(this.rotation / 90) * 90) + 90;
+                if (navigator.vibrate) navigator.vibrate(25);
+                this.requestRender();
+                this.saveStateToSession();
+            },
+
+            requestRender() {
+                if (!this.rAFScheduled) {
+                    this.rAFScheduled = true;
+                    window.requestAnimationFrame(() => {
+                        this.updateTransform();
+                        this.rAFScheduled = false;
+                    });
+                }
+            },
+
+            updateTransform() {
+                const imgContainer = document.getElementById('image-container');
+                imgContainer.style.transform = `translate3d(${this.translateX}px, ${this.translateY}px, 0) rotate(${this.rotation}deg) scale(${this.scale * this.flipX}, ${this.scale * this.flipY}) rotateX(${this.skewY}deg) rotateY(${this.skewX}deg)`;
+            },
+
+            reset() {
+                this.scale = 1;
+                this.translateX = 0;
+                this.translateY = 0;
+                this.rotation = 0;
+                this.flipX = 1;
+                this.flipY = 1;
+                this.skewX = 0;
+                this.skewY = 0;
+                document.getElementById('skew-x-slider').value = 0;
+                document.getElementById('skew-y-slider').value = 0;
+                document.getElementById('skew-x-val').innerText = "0°";
+                document.getElementById('skew-y-val').innerText = "0°";
+                this.requestRender();
+                this.saveStateToSession();
+            },
+
+            toggleQuickFit() {
+                this.scale = this.scale === 1 ? 2.2 : 1.0;
+                if (this.scale === 1.0) {
+                    this.translateX = 0;
+                    this.translateY = 0;
+                }
+                if (navigator.vibrate) navigator.vibrate(15);
+                this.requestRender();
+                this.saveStateToSession();
+            },
+
+            // Session Auto-Restore Cache
+            saveStateToSession() {
+                const state = {
+                    scale: this.scale,
+                    translateX: this.translateX,
+                    translateY: this.translateY,
+                    rotation: this.rotation,
+                    flipX: this.flipX,
+                    flipY: this.flipY,
+                    skewX: this.skewX,
+                    skewY: this.skewY
+                };
+                localStorage.setItem('eStudio_session_state', JSON.stringify(state));
+            },
+
+            restoreStateFromSession() {
+                try {
+                    const raw = localStorage.getItem('eStudio_session_state');
+                    if (raw) {
+                        const s = JSON.parse(raw);
+                        Object.assign(this, s);
+                        this.requestRender();
+                    }
+                } catch (e) { }
+            }
+        };
+
+        // ==========================================
+        // MODULE 4: FILTERS, PAPER MASK & GRID ENGINE
+        // ==========================================
+        const FilterEngine = {
+            brightness: 100,
+            tintVal: 0,
+            stencilDensity: 55,
+            gridSpacing: 40,
+            gridLineWidth: 1.0,
+            gridColor: '#38bdf8',
+            isInverted: false,
+            isContrast: false,
+            isGrid: false,
+            isRuler: false,
+            isStencil: false,
+            paperMaskMode: 0, // 0: None, 1: A4, 2: A5, 3: Letter, 4: Square
+            rawImage: new Image(),
+
+            init() {
+                this.rawImage.crossOrigin = "anonymous";
+                window.addEventListener('resize', () => {
+                    if (this.isGrid) this.renderGrid();
+                    if (this.isRuler) this.renderRuler();
+                    if (this.paperMaskMode > 0) this.renderPaperMask();
+                });
+            },
+
+            update() {
+                const traceImg = document.getElementById('trace-image');
+                const stencilCanvas = document.getElementById('stencil-canvas');
+                const dimOverlay = document.getElementById('dim-overlay');
+                const tintOverlay = document.getElementById('tint-overlay');
+
+                let filterString = `brightness(${Math.min(this.brightness, 100)}%) `;
+                if (this.brightness > 100) {
+                    filterString += `brightness(${this.brightness}%) saturate(${100 + (this.brightness - 100) * 0.4}%) `;
+                }
+                if (this.isInverted) filterString += `invert(100%) `;
+                if (this.isContrast) filterString += `contrast(220%) `;
+
+                traceImg.style.filter = filterString;
+                stencilCanvas.style.filter = filterString;
+
+                if (this.brightness < 100) {
+                    dimOverlay.style.opacity = (1 - (this.brightness / 100)) * 0.85;
+                } else {
+                    dimOverlay.style.opacity = 0;
+                }
+
+                tintOverlay.style.opacity = this.tintVal / 100;
+            },
+
+            setGridColor(color, dotElem) {
+                this.gridColor = color;
+                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+                if (dotElem) dotElem.classList.add('active');
+                if (this.isGrid) this.renderGrid();
+            },
+
+            renderGrid() {
+                const canvas = document.getElementById('grid-canvas');
+                if (!this.isGrid) {
+                    canvas.style.display = 'none';
+                    return;
+                }
+                canvas.style.display = 'block';
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = this.gridColor;
+                ctx.lineWidth = this.gridLineWidth;
+                ctx.globalAlpha = 0.35;
+
+                ctx.beginPath();
+                const step = this.gridSpacing;
+                for (let x = 0; x <= canvas.width; x += step) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                }
+                for (let y = 0; y <= canvas.height; y += step) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                }
+                ctx.stroke();
+            },
+
+            cyclePaperMask() {
+                this.paperMaskMode = (this.paperMaskMode + 1) % 5;
+                this.renderPaperMask();
+                if (navigator.vibrate) navigator.vibrate(20);
+            },
+
+            renderPaperMask() {
+                const canvas = document.getElementById('mask-canvas');
+                if (this.paperMaskMode === 0) {
+                    canvas.style.display = 'none';
+                    document.getElementById('btn-paper-mask').classList.remove('active');
+                    return;
+                }
+                canvas.style.display = 'block';
+                document.getElementById('btn-paper-mask').classList.add('active');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Aspect ratios: 1: A4 (1:1.414), 2: A5 (1:1.414), 3: US Letter (1:1.294), 4: Square (1:1)
+                let ratio = 1.414;
+                let label = "A4 Margin";
+                if (this.paperMaskMode === 2) { ratio = 1.414; label = "A5 Margin"; }
+                if (this.paperMaskMode === 3) { ratio = 1.294; label = "US Letter"; }
+                if (this.paperMaskMode === 4) { ratio = 1.0; label = "1:1 Square"; }
+
+                let maskW, maskH;
+                if (canvas.width > canvas.height) {
+                    maskH = canvas.height * 0.82;
+                    maskW = maskH * ratio;
+                    if (maskW > canvas.width * 0.9) {
+                        maskW = canvas.width * 0.85;
+                        maskH = maskW / ratio;
+                    }
+                } else {
+                    maskW = canvas.width * 0.85;
+                    maskH = maskW * ratio;
+                    if (maskH > canvas.height * 0.85) {
+                        maskH = canvas.height * 0.82;
+                        maskW = maskH / ratio;
+                    }
+                }
+
+                const x = (canvas.width - maskW) / 2;
+                const y = (canvas.height - maskH) / 2;
+
+                // Darken outside paper mask
+                ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(x, y, maskW, maskH);
+
+                // Border line & label
+                ctx.strokeStyle = "#38bdf8";
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(x, y, maskW, maskH);
+
+                ctx.fillStyle = "#38bdf8";
+                ctx.font = "11px sans-serif";
+                ctx.fillText(label, x + 8, y + 16);
+            },
+
+            applySobel() {
+                const stencilCanvas = document.getElementById('stencil-canvas');
+                const traceImg = document.getElementById('trace-image');
+                if (!this.rawImage.src || !this.rawImage.width) return;
+
+                const ctx = stencilCanvas.getContext('2d');
+                const w = Math.min(this.rawImage.width, 1200);
+                const h = (this.rawImage.height / this.rawImage.width) * w;
+                stencilCanvas.width = w;
+                stencilCanvas.height = h;
+
+                try {
+                    ctx.drawImage(this.rawImage, 0, 0, w, h);
+                    const imgData = ctx.getImageData(0, 0, w, h);
+                    const data = imgData.data;
+                    const gray = new Float32Array(w * h);
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        gray[i / 4] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                    }
+
+                    const output = ctx.createImageData(w, h);
+                    const outData = output.data;
+                    const threshold = this.stencilDensity;
+
+                    for (let y = 1; y < h - 1; y++) {
+                        for (let x = 1; x < w - 1; x++) {
+                            const idx = y * w + x;
+                            const gx =
+                                -1 * gray[(y - 1) * w + (x - 1)] + 1 * gray[(y - 1) * w + (x + 1)] +
+                                -2 * gray[y * w + (x - 1)] + 2 * gray[y * w + (x + 1)] +
+                                -1 * gray[(y + 1) * w + (x - 1)] + 1 * gray[(y + 1) * w + (x + 1)];
+
+                            const gy =
+                                -1 * gray[(y - 1) * w + (x - 1)] - 2 * gray[(y - 1) * w + x] - 1 * gray[(y - 1) * w + (x + 1)] +
+                                1 * gray[(y + 1) * w + (x - 1)] + 2 * gray[(y + 1) * w + x] + 1 * gray[(y + 1) * w + (x + 1)];
+
+                            let mag = Math.hypot(gx, gy);
+                            mag = mag > threshold ? 0 : 255;
+
+                            const oIdx = idx * 4;
+                            outData[oIdx] = mag;
+                            outData[oIdx + 1] = mag;
+                            outData[oIdx + 2] = mag;
+                            outData[oIdx + 3] = 255;
+                        }
+                    }
+                    ctx.putImageData(output, 0, 0);
+                    stencilCanvas.style.display = 'block';
+                    traceImg.style.display = 'none';
+                } catch (corsErr) {
+                    traceImg.style.filter = "grayscale(100%) contrast(350%) invert(100%)";
+                    traceImg.style.display = 'block';
+                    stencilCanvas.style.display = 'none';
+                }
+            },
+
+            renderRuler() {
+                const canvas = document.getElementById('ruler-canvas');
+                const overlay = document.getElementById('ruler-overlay');
+                if (!this.isRuler) {
+                    overlay.style.display = 'none';
+                    return;
+                }
+                overlay.style.display = 'block';
+                canvas.width = window.innerWidth;
+                canvas.height = 30;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#38bdf8";
+                ctx.strokeStyle = "#38bdf8";
+                ctx.font = "10px sans-serif";
+
+                const mmStep = 96 / 25.4;
+                let pos = 0;
+                let count = 0;
+                while (pos < canvas.width) {
+                    const isCm = count % 10 === 0;
+                    const h = isCm ? 18 : (count % 5 === 0 ? 12 : 6);
+                    ctx.beginPath();
+                    ctx.moveTo(pos, 0);
+                    ctx.lineTo(pos, h);
+                    ctx.stroke();
+                    if (isCm && count > 0) ctx.fillText(`${count / 10}`, pos + 2, 24);
+                    pos += mmStep;
+                    count++;
+                }
+            }
+        };
+
+        // ==========================================
+        // INITIALIZATION & UI BINDINGS
+        // ==========================================
+        StorageModule.init();
+        GestureEngine.init();
+        FilterEngine.init();
+
+        // Screen Wake Lock API
+        let wakeLock = null;
+        async function initWakeLock() {
+            if ('wakeLock' in navigator) {
+                try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { }
+            }
+        }
+        initWakeLock();
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') initWakeLock();
+        });
+
+        // Image Ingestion & LocalStorage Auto-Restore
+        function loadImageFromBlob(blob, shouldSaveSession = true) {
+            StorageModule.currentBlob = blob;
+            const objectURL = URL.createObjectURL(blob);
+            const traceImg = document.getElementById('trace-image');
+            const welcomeSlate = document.getElementById('welcome-slate');
+
+            FilterEngine.rawImage = new Image();
+            FilterEngine.rawImage.crossOrigin = "anonymous";
+            FilterEngine.rawImage.onload = () => {
+                traceImg.src = objectURL;
+                traceImg.style.display = FilterEngine.isStencil ? 'none' : 'block';
+                if (FilterEngine.isStencil) FilterEngine.applySobel();
+                welcomeSlate.style.display = 'none';
+                GestureEngine.reset();
+                GestureEngine.restoreStateFromSession();
+            };
+            FilterEngine.rawImage.src = objectURL;
+
+            if (shouldSaveSession) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        localStorage.setItem('eStudio_cached_image', e.target.result);
+                    } catch (err) { }
+                };
+                reader.readAsDataURL(blob);
+            }
+        }
+
+        // Auto-Restore previous active drawing on reload
+        window.addEventListener('DOMContentLoaded', () => {
+            const cached = localStorage.getItem('eStudio_cached_image');
+            if (cached) {
+                fetch(cached).then(res => res.blob()).then(blob => {
+                    loadImageFromBlob(blob, false);
+                }).catch(() => { });
+            }
+        });
+
+        // Modal UI Handlers
+        const guideDrawerModal = document.getElementById('guide-drawer-modal');
+        const cardDetailModal = document.getElementById('card-detail-modal');
+        const collectionModal = document.getElementById('collection-modal');
+        const searchModal = document.getElementById('search-modal');
+        const brightnessPopup = document.getElementById('brightness-popup');
+        const tintPopup = document.getElementById('tint-popup');
+        const stencilPopup = document.getElementById('stencil-popup');
+        const gridCustomizerPopup = document.getElementById('grid-customizer-popup');
+        const keystonePopup = document.getElementById('keystone-popup');
+        const overflowDrawer = document.getElementById('overflow-drawer');
+
+        function openCardModal(cardKey) {
+            const data = LocaleEngine.i18n[LocaleEngine.currentLang].cards[cardKey];
+            if (!data) return;
+            document.getElementById('card-modal-title').innerText = data.title;
+            document.getElementById('card-modal-what').innerText = data.what;
+            document.getElementById('card-modal-example').innerText = data.example;
+            cardDetailModal.style.display = 'flex';
+        }
+
+        document.getElementById('btn-close-card-modal').addEventListener('click', () => cardDetailModal.style.display = 'none');
+        document.getElementById('btn-close-guide').addEventListener('click', () => guideDrawerModal.style.display = 'none');
+
+        document.getElementById('btn-help').addEventListener('click', (e) => {
+            e.stopPropagation();
+            guideDrawerModal.style.display = guideDrawerModal.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Clipboard Paste
+        async function pasteFromClipboard() {
+            try {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    const imageType = item.types.find(type => type.startsWith('image/'));
+                    if (imageType) {
+                        const blob = await item.getType(imageType);
+                        loadImageFromBlob(blob);
+                        return;
+                    }
+                }
+                alert("No image found on clipboard.");
+            } catch (err) {
+                alert("Please grant clipboard permission or use Ctrl+V.");
+            }
+        }
+        document.getElementById('btn-paste').addEventListener('click', pasteFromClipboard);
+
+        window.addEventListener('paste', (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    loadImageFromBlob(item.getAsFile());
+                    break;
+                }
+            }
+        });
+
+        // File Input & Drag/Drop
+        const fileInput = document.getElementById('file-input');
+        document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) loadImageFromBlob(e.target.files[0]);
+        });
+
+        window.addEventListener('dragover', (e) => { e.preventDefault(); document.getElementById('drag-overlay').style.display = 'block'; });
+        window.addEventListener('dragleave', (e) => { if (e.clientX <= 0 || e.clientY <= 0) document.getElementById('drag-overlay').style.display = 'none'; });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            document.getElementById('drag-overlay').style.display = 'none';
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                loadImageFromBlob(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Collection Modal
+        document.getElementById('btn-save-collection').addEventListener('click', () => StorageModule.saveCurrent());
+        document.getElementById('btn-open-collection').addEventListener('click', () => {
+            const grid = document.getElementById('library-grid');
+            grid.innerHTML = '';
+            StorageModule.loadAll((items) => {
+                if (!items || items.length === 0) {
+                    grid.innerHTML = `<div class="empty-library-notice">${LocaleEngine.i18n[LocaleEngine.currentLang].msg_empty_collection}</div>`;
+                    return;
+                }
+                items.reverse().forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'library-item';
+                    const imgUrl = URL.createObjectURL(item.blob);
+                    div.innerHTML = `<img src="${imgUrl}" alt="Reference" /><button class="library-item-del">✕</button>`;
+                    div.querySelector('img').onclick = () => {
+                        loadImageFromBlob(item.blob);
+                        collectionModal.style.display = 'none';
+                    };
+                    div.querySelector('.library-item-del').onclick = (e) => {
+                        e.stopPropagation();
+                        StorageModule.deleteItem(item.id, () => document.getElementById('btn-open-collection').click());
+                    };
+                    grid.appendChild(div);
+                });
+            });
+            collectionModal.style.display = 'flex';
+        });
+        document.getElementById('btn-close-collection').addEventListener('click', () => collectionModal.style.display = 'none');
+
+        // Web Search Engine
+        const searchInput = document.getElementById('search-input');
+        async function executeSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            const status = document.getElementById('search-status');
+            const results = document.getElementById('search-results');
+            status.style.display = 'block';
+            status.innerText = LocaleEngine.currentLang === 'es' ? 'Buscando...' : 'Searching archive...';
+            results.innerHTML = '';
+
+            try {
+                const endpoint = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query + " drawing OR sketch OR illustration")}&gsrlimit=18&prop=pageimages&pithumbsize=600&format=json&origin=*`;
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                status.style.display = 'none';
+
+                if (data.query && data.query.pages) {
+                    Object.values(data.query.pages).filter(p => p.thumbnail).forEach(p => {
+                        const img = document.createElement('img');
+                        img.src = p.thumbnail.source;
+                        img.onclick = async () => {
+                            try {
+                                const imgRes = await fetch(p.thumbnail.source);
+                                const blob = await imgRes.blob();
+                                loadImageFromBlob(blob);
+                            } catch (e) {
+                                const traceImg = document.getElementById('trace-image');
+                                traceImg.src = p.thumbnail.source;
+                                traceImg.style.display = 'block';
+                                document.getElementById('welcome-slate').style.display = 'none';
+                            }
+                            searchModal.style.display = 'none';
+                        };
+                        results.appendChild(img);
+                    });
+                } else {
+                    status.style.display = 'block';
+                    status.innerText = LocaleEngine.currentLang === 'es' ? 'Sin resultados.' : 'No results found.';
+                }
+            } catch (err) {
+                status.style.display = 'block';
+                status.innerText = 'Error connecting to search.';
+            }
+        }
+
+        document.getElementById('btn-run-search').addEventListener('click', executeSearch);
+        searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') executeSearch(); });
+        document.getElementById('btn-search-modal').addEventListener('click', () => { searchModal.style.display = 'flex'; searchInput.focus(); });
+        document.getElementById('btn-cancel-search').addEventListener('click', () => searchModal.style.display = 'none');
+
+        // Grid Controls
+        document.getElementById('btn-grid').addEventListener('click', (e) => {
+            e.stopPropagation();
+            FilterEngine.isGrid = !FilterEngine.isGrid;
+            document.getElementById('btn-grid').classList.toggle('active', FilterEngine.isGrid);
+            FilterEngine.renderGrid();
+            gridCustomizerPopup.style.display = FilterEngine.isGrid ? 'flex' : 'none';
+            brightnessPopup.style.display = 'none';
+            tintPopup.style.display = 'none';
+            keystonePopup.style.display = 'none';
+        });
+
+        document.getElementById('grid-size-slider').addEventListener('input', (e) => {
+            FilterEngine.gridSpacing = parseInt(e.target.value);
+            document.getElementById('grid-size-val').innerText = `${FilterEngine.gridSpacing}px`;
+            FilterEngine.renderGrid();
+        });
+
+        document.getElementById('grid-width-slider').addEventListener('input', (e) => {
+            FilterEngine.gridLineWidth = parseFloat(e.target.value) / 10;
+            document.getElementById('grid-width-val').innerText = `${FilterEngine.gridLineWidth.toFixed(1)}px`;
+            FilterEngine.renderGrid();
+        });
+
+        // Invert, Contrast, Reset
+        document.getElementById('btn-invert').addEventListener('click', () => {
+            FilterEngine.isInverted = !FilterEngine.isInverted;
+            document.body.classList.toggle('dark-mode', FilterEngine.isInverted);
+            document.getElementById('btn-invert').classList.toggle('active', FilterEngine.isInverted);
+            FilterEngine.update();
+        });
+
+        document.getElementById('btn-contrast').addEventListener('click', () => {
+            FilterEngine.isContrast = !FilterEngine.isContrast;
+            document.getElementById('btn-contrast').classList.toggle('active', FilterEngine.isContrast);
+            FilterEngine.update();
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', () => GestureEngine.reset());
+
+        // Drawer Tools
+        document.getElementById('btn-overflow').addEventListener('click', (e) => {
+            e.stopPropagation();
+            overflowDrawer.style.display = overflowDrawer.style.display === 'flex' ? 'none' : 'flex';
+            gridCustomizerPopup.style.display = 'none';
+            brightnessPopup.style.display = 'none';
+            keystonePopup.style.display = 'none';
+        });
+
+        document.getElementById('btn-rotate-90').addEventListener('click', () => GestureEngine.rotateStep90());
+        document.getElementById('btn-paper-mask').addEventListener('click', () => FilterEngine.cyclePaperMask());
+
+        document.getElementById('btn-flip-x').addEventListener('click', () => {
+            GestureEngine.flipX *= -1;
+            document.getElementById('btn-flip-x').classList.toggle('active', GestureEngine.flipX === -1);
+            GestureEngine.requestRender();
+        });
+
+        document.getElementById('btn-flip-y').addEventListener('click', () => {
+            GestureEngine.flipY *= -1;
+            document.getElementById('btn-flip-y').classList.toggle('active', GestureEngine.flipY === -1);
+            GestureEngine.requestRender();
+        });
+
+        document.getElementById('btn-keystone-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            keystonePopup.style.display = keystonePopup.style.display === 'flex' ? 'none' : 'flex';
+            overflowDrawer.style.display = 'none';
+        });
+
+        document.getElementById('skew-x-slider').addEventListener('input', (e) => {
+            GestureEngine.skewX = parseInt(e.target.value);
+            document.getElementById('skew-x-val').innerText = `${GestureEngine.skewX}°`;
+            GestureEngine.requestRender();
+        });
+
+        document.getElementById('skew-y-slider').addEventListener('input', (e) => {
+            GestureEngine.skewY = parseInt(e.target.value);
+            document.getElementById('skew-y-val').innerText = `${GestureEngine.skewY}°`;
+            GestureEngine.requestRender();
+        });
+
+        document.getElementById('btn-stencil').addEventListener('click', () => {
+            FilterEngine.isStencil = !FilterEngine.isStencil;
+            document.getElementById('btn-stencil').classList.toggle('active', FilterEngine.isStencil);
+            if (FilterEngine.isStencil) {
+                FilterEngine.applySobel();
+            } else {
+                document.getElementById('stencil-canvas').style.display = 'none';
+                if (FilterEngine.rawImage.src) document.getElementById('trace-image').style.display = 'block';
+            }
+        });
+
+        document.getElementById('btn-ruler').addEventListener('click', () => {
+            FilterEngine.isRuler = !FilterEngine.isRuler;
+            document.getElementById('btn-ruler').classList.toggle('active', FilterEngine.isRuler);
+            FilterEngine.renderRuler();
+        });
+
+        // Brightness & Tint Popups
+        document.getElementById('btn-brightness-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            brightnessPopup.style.display = brightnessPopup.style.display === 'flex' ? 'none' : 'flex';
+            gridCustomizerPopup.style.display = 'none';
+            tintPopup.style.display = 'none';
+            keystonePopup.style.display = 'none';
+        });
+
+        document.getElementById('brightness-slider').addEventListener('input', (e) => {
+            FilterEngine.brightness = parseInt(e.target.value);
+            document.getElementById('brightness-val').innerText = `${FilterEngine.brightness}%`;
+            FilterEngine.update();
+        });
+
+        document.getElementById('btn-tint-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            tintPopup.style.display = tintPopup.style.display === 'flex' ? 'none' : 'flex';
+            brightnessPopup.style.display = 'none';
+            gridCustomizerPopup.style.display = 'none';
+            overflowDrawer.style.display = 'none';
+        });
+
+        document.getElementById('tint-slider').addEventListener('input', (e) => {
+            FilterEngine.tintVal = parseInt(e.target.value);
+            document.getElementById('tint-val').innerText = `${FilterEngine.tintVal}%`;
+            FilterEngine.update();
+        });
+
+        // Fullscreen API
+        const fullscreenIcon = document.getElementById('fullscreen-icon');
+        const expandIconPath = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z";
+        const collapseIconPath = "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z";
+
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            } else {
+                document.exitFullscreen().catch(() => { });
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFullscreen = !!document.fullscreenElement;
+            fullscreenIcon.innerHTML = `<path d="${isFullscreen ? collapseIconPath : expandIconPath}"/>`;
+            document.getElementById('btn-fullscreen').classList.toggle('active', isFullscreen);
+        });
+
+        // Touch Lock Mode with Haptics
+        const lockShield = document.getElementById('lock-shield');
+        const unlockPill = document.getElementById('unlock-pill');
+        const unlockProgress = document.getElementById('unlock-progress');
+        const toolbar = document.getElementById('toolbar');
+
+        document.getElementById('btn-lock').addEventListener('click', () => {
+            GestureEngine.isLocked = true;
+            lockShield.style.display = 'block';
+            toolbar.classList.add('toolbar-locked');
+            brightnessPopup.style.display = 'none';
+            tintPopup.style.display = 'none';
+            gridCustomizerPopup.style.display = 'none';
+            keystonePopup.style.display = 'none';
+            overflowDrawer.style.display = 'none';
+            if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+        });
+
+        let holdTimer = null;
+        unlockPill.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            unlockProgress.style.width = '100%';
+            unlockProgress.style.transition = 'width 1s linear';
+            holdTimer = setTimeout(() => {
+                GestureEngine.isLocked = false;
+                lockShield.style.display = 'none';
+                toolbar.classList.remove('toolbar-locked');
+                unlockProgress.style.transition = 'none';
+                unlockProgress.style.width = '0%';
+                if (navigator.vibrate) navigator.vibrate(60);
+            }, 1000);
+        });
+
+        const cancelHold = () => {
+            clearTimeout(holdTimer);
+            unlockProgress.style.transition = 'none';
+            unlockProgress.style.width = '0%';
+        };
+        unlockPill.addEventListener('pointerup', cancelHold);
+        unlockPill.addEventListener('pointerleave', cancelHold);
+        unlockPill.addEventListener('pointercancel', cancelHold);
+
+        // Click-Outside Dismissals
+        document.addEventListener('click', (e) => {
+            if (guideDrawerModal.style.display === 'flex' && e.target === guideDrawerModal) guideDrawerModal.style.display = 'none';
+            if (!brightnessPopup.contains(e.target) && e.target.id !== 'btn-brightness-toggle') brightnessPopup.style.display = 'none';
+            if (!tintPopup.contains(e.target) && e.target.id !== 'btn-tint-toggle') tintPopup.style.display = 'none';
+            if (!gridCustomizerPopup.contains(e.target) && e.target.id !== 'btn-grid') gridCustomizerPopup.style.display = 'none';
+            if (!keystonePopup.contains(e.target) && e.target.id !== 'btn-keystone-toggle') keystonePopup.style.display = 'none';
+            if (!overflowDrawer.contains(e.target) && e.target.id !== 'btn-overflow') overflowDrawer.style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>

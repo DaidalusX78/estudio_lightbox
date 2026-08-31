@@ -1,0 +1,397 @@
+/* --- Floating Multi-Image Layer Selector --- */
+#layer-selector-bar {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(18, 18, 18, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 5px 8px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    z-index: 100;
+    max-width: calc(100vw - 32px);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#layer-selector-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.layer-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-heading);
+    padding: 4px 10px 4px 6px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.layer-chip span {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.layer-chip.active {
+    background: rgba(56, 189, 248, 0.18);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.layer-chip img {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.layer-chip-del {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 2px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+
+.layer-chip-del:hover {
+    color: var(--danger);
+}
+
+/* --- Main Toolbar --- */
+#toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 10px;
+    border-radius: 40px;
+    border: 1px solid var(--border);
+    z-index: 100;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-width: calc(100vw - 16px);
+    box-sizing: border-box;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+}
+
+#toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.toolbar-locked {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-50%) translateY(20px) !important;
+}
+
+.btn {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-muted);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.btn.active {
+    color: var(--accent);
+    background: var(--accent-glow);
+}
+
+.divider {
+    width: 1px;
+    height: 22px;
+    background: var(--border);
+    margin: 0 2px;
+    flex-shrink: 0;
+}
+
+.btn-lock {
+    background: var(--accent);
+    color: #000000;
+    font-weight: 700;
+    width: auto;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 22px;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.btn-lock svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+}
+
+.btn-lock:hover {
+    background: var(--accent-hover);
+    color: #000;
+}
+
+#btn-help {
+    background: var(--accent);
+    color: var(--bg-card);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+#btn-help:hover {
+    background: var(--accent-hover);
+    color: var(--bg-card-hover);
+}
+
+.icon-import-rotated {
+    transform: rotate(90deg);
+}
+
+/* --- Touch Lock Shield --- */
+#lock-shield {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 200;
+}
+
+#unlock-pill {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(24, 24, 27, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-heading);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+#unlock-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    background: var(--accent-focus);
+    pointer-events: none;
+}
+
+/* --- Responsive Viewport & Device Adaptations --- */
+@media (orientation: portrait) {
+    .portrait-hide {
+        display: none !important;
+    }
+
+    #toolbar {
+        bottom: 16px;
+        padding: 5px 8px;
+        gap: 4px;
+        max-width: calc(100vw - 16px);
+    }
+
+    .btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-lock {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border-radius: 50%;
+        gap: 0;
+        justify-content: center;
+    }
+
+    .btn-lock span {
+        display: none;
+    }
+
+    .btn-lock svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    #welcome-slate {
+        gap: 8px;
+        transform: translateY(-24px);
+    }
+
+    .hero-app-logo {
+        width: 140px;
+        height: 140px;
+    }
+
+    .brand-title-wrap {
+        font-size: 26px;
+    }
+
+    .version-tag {
+        font-size: 12px;
+        padding: 2px 6px;
+    }
+
+    #welcome-slate p.byline {
+        font-size: 13px;
+    }
+}
+
+/* Extra compact optimization for phones <= 420px (Pixel 8, iPhone standard, Galaxy) */
+@media (max-width: 420px) and (orientation: portrait) {
+    #toolbar {
+        bottom: 14px;
+        padding: 4px 6px;
+        gap: 3px;
+        max-width: calc(100vw - 12px);
+    }
+
+    .btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    #btn-help {
+        font-size: 15px;
+    }
+
+    .divider {
+        margin: 0 1px;
+        height: 18px;
+    }
+
+    .btn-lock {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn-lock svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-height: 540px) {
+    #toolbar {
+        bottom: 10px;
+        padding: 4px 8px;
+        gap: 5px;
+        max-width: calc(100vw - 16px);
+    }
+
+    .btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-lock {
+        height: 40px;
+        padding: 0 14px;
+        font-size: 12px;
+    }
+
+    #welcome-slate {
+        gap: 6px;
+        transform: translateY(-16px);
+    }
+
+    .hero-app-logo {
+        width: 88px;
+        height: 88px;
+    }
+
+    .brand-title-wrap {
+        font-size: 22px;
+    }
+
+    .version-tag {
+        font-size: 11px;
+        padding: 2px 5px;
+    }
+
+    #welcome-slate p.byline {
+        font-size: 12px;
+    }
+
+    #btn-camera-shutter {
+        bottom: 60px;
+        width: 48px;
+        height: 48px;
+    }
+
+    .shutter-inner {
+        width: 36px;
+        height: 36px;
+    }
+
+    .shutter-inner svg {
+        width: 18px;
+        height: 18px;
+    }
+}
