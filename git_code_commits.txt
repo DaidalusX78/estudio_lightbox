@@ -1,0 +1,39 @@
+🔄 How to Save Future Updates
+Whenever you make new changes or reach a new milestone:
+
+Stage & Commit:
+powershell
+git add .
+git commit -m "Describe your changes here"
+Tag a New Version (Optional for releases):
+powershell
+git tag -a v0.21 -m "Release v0.21"
+Push to GitHub:
+powershell
+git push origin main --tags
+(Or simply use the Source Control panel in Antigravity IDE on the left sidebar by pressing Ctrl + Shift + G).
+
+
+
+
+
+
+1. Update the 2 Version Spots in index.html:
+Browser Tab Title (Line 13):
+html
+<title>eStudio Lightbox - v0.21</title>
+Welcome Screen Badge (Line 53):
+html
+<span class="version-tag">v0.21</span>
+2. Commit & Push to Git:
+powershell
+# 1. Stage and commit
+git add .
+git commit -m "Release v0.21: summary of what changed"
+# 2. Add the version tag
+git tag -a v0.21 -m "Release v0.21"
+# 3. Push to GitHub
+git push origin main --tags
+(Or click the Commit button in Antigravity's Source Control panel, and then push).
+
+Now Git will maintain an exact historical snapshot for every version you release!

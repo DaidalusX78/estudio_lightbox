@@ -139,19 +139,22 @@
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 14px;
+    padding: 16px;
     border-radius: 20px;
     border: 1px solid var(--border);
     display: none;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     z-index: 150;
-    width: 280px;
+    width: min(350px, calc(100vw - 24px));
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
     color: var(--text-primary);
+    box-sizing: border-box;
 }
 
 .drawer-section-title {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -169,14 +172,17 @@
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    padding: 8px 4px;
+    padding: 10px 4px;
+    min-height: 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 6px;
     color: var(--text-heading);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
+    text-align: center;
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -189,8 +195,8 @@
 }
 
 .drawer-action-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     fill: currentColor;
 }
 

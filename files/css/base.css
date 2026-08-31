@@ -165,18 +165,18 @@ body.dark-mode {
 }
 
 .hero-app-logo {
-    width: 180px;
-    height: 180px;
-    max-width: 45vw;
-    max-height: 35vh;
+    width: 320px;
+    height: 320px;
+    max-width: 60vw;
+    max-height: 42vh;
     transition: transform 0.25s ease;
 }
 
 .title-row {
     display: flex;
-    align-items: flex-end;
+    align-items: baseline;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: nowrap;
 }
 
@@ -185,7 +185,7 @@ body.dark-mode {
     align-items: baseline;
     gap: 2px;
     color: var(--text-dark);
-    font-size: 34px;
+    font-size: 52px;
     line-height: 1;
 }
 
@@ -210,22 +210,23 @@ body.dark-mode .brand-title-wrap {
 }
 
 .version-tag {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--text-dim);
-    letter-spacing: 0.03em;
-    background: rgba(113, 113, 122, 0.12);
-    padding: 3px 8px;
-    border-radius: 8px;
-    border: 1px solid rgba(113, 113, 122, 0.2);
-    align-self: flex-end;
-    margin-bottom: 3px;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 2px;
+    align-self: baseline;
+    opacity: 0.75;
 }
 
 body.dark-mode .version-tag {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: transparent;
+    border: none;
     color: var(--text-muted);
+    opacity: 0.75;
 }
 
 #welcome-slate p.byline {
