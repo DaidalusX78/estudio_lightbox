@@ -98,10 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-help')?.classList.toggle('active', guideDrawerModal?.style.display === 'flex');
         document.getElementById('btn-open-collection')?.classList.toggle('active', collectionModal?.style.display === 'flex');
         document.getElementById('btn-brightness-toggle')?.classList.toggle('active', brightnessPopup?.style.display === 'flex');
-        document.getElementById('btn-grid')?.classList.toggle('active', gridCustomizerPopup?.style.display === 'flex');
+        document.getElementById('btn-grid')?.classList.toggle('active', FilterEngine.isGrid || gridCustomizerPopup?.style.display === 'flex');
         document.getElementById('btn-overflow')?.classList.toggle('active', overflowDrawer?.style.display === 'flex');
         document.getElementById('btn-keystone-toggle')?.classList.toggle('active', keystonePopup?.style.display === 'flex');
         document.getElementById('btn-tint-toggle')?.classList.toggle('active', tintPopup?.style.display === 'flex');
+        document.getElementById('btn-ruler')?.classList.toggle('active', !!FilterEngine.isRuler);
     };
 
     const closeAllPopupsAndDrawers = (except = null) => {
@@ -231,13 +232,38 @@ document.addEventListener('DOMContentLoaded', () => {
         syncToolbarPopupActiveStates();
     });
 
+    const flashActionGlow = (...elements) => {
+        elements.forEach(elem => {
+            if (!elem) return;
+            elem.classList.add('action-tap-glow');
+            setTimeout(() => elem.classList.remove('action-tap-glow'), 220);
+        });
+    };
+
     // 8. Grid Controls
     document.getElementById('btn-grid')?.addEventListener('click', (e) => {
         e.stopPropagation();
-        FilterEngine.isGrid = !FilterEngine.isGrid;
+        if (!FilterEngine.isGrid) {
+            FilterEngine.isGrid = true;
+            FilterEngine.renderGrid();
+            closeAllPopupsAndDrawers(gridCustomizerPopup);
+            if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'flex';
+        } else {
+            if (gridCustomizerPopup && gridCustomizerPopup.style.display === 'flex') {
+                gridCustomizerPopup.style.display = 'none';
+            } else {
+                closeAllPopupsAndDrawers(gridCustomizerPopup);
+                if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'flex';
+            }
+        }
+        syncToolbarPopupActiveStates();
+    });
+
+    document.getElementById('btn-close-grid')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        FilterEngine.isGrid = false;
         FilterEngine.renderGrid();
-        closeAllPopupsAndDrawers(gridCustomizerPopup);
-        if (gridCustomizerPopup) gridCustomizerPopup.style.display = FilterEngine.isGrid ? 'flex' : 'none';
+        if (gridCustomizerPopup) gridCustomizerPopup.style.display = 'none';
         syncToolbarPopupActiveStates();
     });
 
@@ -262,9 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         LayerManager.recordHistory('invert');
         active.isInverted = !active.isInverted;
         document.body.classList.toggle('dark-mode', active.isInverted);
-        document.getElementById('btn-invert')?.classList.toggle('active', active.isInverted);
-        const dInvert = document.getElementById('btn-drawer-invert');
-        if (dInvert) dInvert.classList.toggle('active', active.isInverted);
+        flashActionGlow(document.getElementById('btn-invert'), document.getElementById('btn-drawer-invert'));
         FilterEngine.update();
         LayerManager.saveSession();
     });
@@ -274,14 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('contrast');
         active.isContrast = !active.isContrast;
-        document.getElementById('btn-contrast')?.classList.toggle('active', active.isContrast);
-        const dContrast = document.getElementById('btn-drawer-contrast');
-        if (dContrast) dContrast.classList.toggle('active', active.isContrast);
+        flashActionGlow(document.getElementById('btn-contrast'), document.getElementById('btn-drawer-contrast'));
         FilterEngine.update();
         LayerManager.saveSession();
     });
 
-    document.getElementById('btn-reset')?.addEventListener('click', () => GestureEngine.reset());
+    document.getElementById('btn-reset')?.addEventListener('click', () => {
+        flashActionGlow(document.getElementById('btn-reset'), document.getElementById('btn-drawer-reset'));
+        GestureEngine.reset();
+    });
 
     // 10. Overflow Drawer Tools
     document.getElementById('btn-overflow')?.addEventListener('click', (e) => {
@@ -290,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCurrentlyOpen = overflowDrawer.style.display === 'flex';
             closeAllPopupsAndDrawers(overflowDrawer);
             overflowDrawer.style.display = isCurrentlyOpen ? 'none' : 'flex';
+            syncToolbarPopupActiveStates();
         }
     });
 
@@ -298,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('rotate_90');
         active.rotation = (Math.round(active.rotation / 90) * 90) + 90;
+        flashActionGlow(document.getElementById('btn-rotate-90'), document.getElementById('btn-toolbar-rotate'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -308,8 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('flip_x');
         active.flipX = (active.flipX || 1) * -1;
-        document.getElementById('btn-flip-x')?.classList.toggle('active', active.flipX === -1);
-        document.getElementById('btn-toolbar-flip-x')?.classList.toggle('active', active.flipX === -1);
+        flashActionGlow(document.getElementById('btn-flip-x'), document.getElementById('btn-toolbar-flip-x'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -320,8 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('flip_y');
         active.flipY = (active.flipY || 1) * -1;
-        document.getElementById('btn-flip-y')?.classList.toggle('active', active.flipY === -1);
-        document.getElementById('btn-toolbar-flip-y')?.classList.toggle('active', active.flipY === -1);
+        flashActionGlow(document.getElementById('btn-flip-y'), document.getElementById('btn-toolbar-flip-y'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -340,6 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCurrentlyOpen = keystonePopup.style.display === 'flex';
             closeAllPopupsAndDrawers(keystonePopup);
             keystonePopup.style.display = isCurrentlyOpen ? 'none' : 'flex';
+            syncToolbarPopupActiveStates();
         }
     });
 
@@ -368,8 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('stencil');
         active.isStencil = !active.isStencil;
-        document.getElementById('btn-stencil')?.classList.toggle('active', active.isStencil);
-        document.getElementById('btn-drawer-stencil')?.classList.toggle('active', active.isStencil);
+        flashActionGlow(document.getElementById('btn-stencil'), document.getElementById('btn-drawer-stencil'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -378,10 +403,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-stencil')?.addEventListener('click', triggerStencilToggle);
     document.getElementById('btn-drawer-stencil')?.addEventListener('click', triggerStencilToggle);
 
-    document.getElementById('btn-ruler')?.addEventListener('click', () => {
+    document.getElementById('btn-ruler')?.addEventListener('click', (e) => {
+        e.stopPropagation();
         FilterEngine.isRuler = !FilterEngine.isRuler;
-        document.getElementById('btn-ruler')?.classList.toggle('active', FilterEngine.isRuler);
         FilterEngine.renderRuler();
+        syncToolbarPopupActiveStates();
     });
 
     // Drawer action duplicates (accessible when hidden from compact mobile bar)
@@ -493,6 +519,8 @@ document.addEventListener('DOMContentLoaded', () => {
         GestureEngine.isLocked = true;
         if (lockShield) lockShield.style.display = 'block';
         if (toolbar) toolbar.classList.add('toolbar-locked');
+        const layerSelectorBar = document.getElementById('layer-selector-bar');
+        if (layerSelectorBar) layerSelectorBar.style.display = 'none';
         if (CameraEngine.shutterBtn) CameraEngine.shutterBtn.style.display = 'none';
         if (brightnessPopup) brightnessPopup.style.display = 'none';
         if (tintPopup) tintPopup.style.display = 'none';
@@ -517,6 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
             unlockPill.classList.remove('holding');
             if (lockShield) lockShield.style.display = 'none';
             if (toolbar) toolbar.classList.remove('toolbar-locked');
+            LayerManager.updateUI();
             if (CameraEngine.isActive && CameraEngine.shutterBtn) {
                 CameraEngine.shutterBtn.style.display = 'flex';
             }

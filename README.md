@@ -1,4 +1,4 @@
-# eStudio Lightbox (v0.28)
+# eStudio Lightbox (v0.29)
 
 A dedicated, precision digital tracing and light table application designed to help artists, calligraphers, illustrators, and learners draw and trace references effortlessly.
 
