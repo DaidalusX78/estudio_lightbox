@@ -22,36 +22,49 @@ const StorageModule = {
 
     async saveCurrent() {
         const active = LayerManager.getActive();
-        if (!active || (!active.blob && !active.dataUrl)) {
+        if (!active || (!active.dataUrl && !active.blob)) {
             alert(LocaleEngine.currentLang === 'es' ? 'No hay ninguna imagen cargada en la pantalla.' : 'No active image loaded on canvas to save.');
             return;
         }
 
-        let blobToSave = active.blob;
-        if (!blobToSave && active.dataUrl) {
-            try {
-                const res = await fetch(active.dataUrl);
-                blobToSave = await res.blob();
-            } catch (e) {
-                blobToSave = null;
-            }
-        }
-
         const saveData = {
-            blob: blobToSave,
             dataUrl: active.dataUrl,
             name: active.name || 'Saved Drawing',
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            state: {
+                scale: active.scale || 1,
+                translateX: active.translateX || 0,
+                translateY: active.translateY || 0,
+                rotation: active.rotation || 0,
+                flipX: active.flipX || 1,
+                flipY: active.flipY || 1,
+                skewX: active.skewX || 0,
+                skewY: active.skewY || 0,
+                brightness: active.brightness || 100,
+                isInverted: active.isInverted || false,
+                isContrast: active.isContrast || false,
+                isStencil: active.isStencil || false,
+                stencilDensity: active.stencilDensity || 55
+            }
         };
 
         const doSave = (db) => {
-            const tx = db.transaction([this.STORE_NAME], 'readwrite');
-            const store = tx.objectStore(this.STORE_NAME);
-            store.add(saveData);
-            tx.oncomplete = () => {
-                if (navigator.vibrate) navigator.vibrate(30);
-                alert(LocaleEngine.i18n[LocaleEngine.currentLang].msg_saved_collection);
-            };
+            try {
+                const tx = db.transaction([this.STORE_NAME], 'readwrite');
+                const store = tx.objectStore(this.STORE_NAME);
+                const req = store.add(saveData);
+                req.onsuccess = () => {
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    alert(LocaleEngine.i18n[LocaleEngine.currentLang].msg_saved_collection);
+                };
+                req.onerror = (err) => {
+                    console.error('Save error:', err);
+                    alert(LocaleEngine.currentLang === 'es' ? 'Error al guardar en la colección.' : 'Error saving to collection.');
+                };
+            } catch (e) {
+                console.error('Transaction error:', e);
+                alert(LocaleEngine.currentLang === 'es' ? 'Error al guardar en la colección.' : 'Error saving to collection.');
+            }
         };
 
         if (this.db) {

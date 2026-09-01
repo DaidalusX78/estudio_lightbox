@@ -276,15 +276,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('btn-rotate-90')?.addEventListener('click', () => GestureEngine.rotateStep90());
+    document.getElementById('btn-rotate-90')?.addEventListener('click', () => {
+        const active = LayerManager.getActive();
+        if (!active) return;
+        LayerManager.recordHistory('rotate_90');
+        active.rotation = (Math.round(active.rotation / 90) * 90) + 90;
+        if (navigator.vibrate) navigator.vibrate(25);
+        LayerManager.renderLayer(active);
+        LayerManager.saveSession();
+    });
 
     document.getElementById('btn-flip-x')?.addEventListener('click', () => {
         const active = LayerManager.getActive();
         if (!active) return;
         LayerManager.recordHistory('flip_x');
-        active.flipX *= -1;
+        active.flipX = (active.flipX || 1) * -1;
         document.getElementById('btn-flip-x')?.classList.toggle('active', active.flipX === -1);
-        GestureEngine.requestRender();
+        if (navigator.vibrate) navigator.vibrate(25);
+        LayerManager.renderLayer(active);
         LayerManager.saveSession();
     });
 
@@ -292,9 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const active = LayerManager.getActive();
         if (!active) return;
         LayerManager.recordHistory('flip_y');
-        active.flipY *= -1;
+        active.flipY = (active.flipY || 1) * -1;
         document.getElementById('btn-flip-y')?.classList.toggle('active', active.flipY === -1);
-        GestureEngine.requestRender();
+        if (navigator.vibrate) navigator.vibrate(25);
+        LayerManager.renderLayer(active);
         LayerManager.saveSession();
     });
 
