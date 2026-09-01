@@ -282,29 +282,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 9. Invert, Contrast, Reset
-    document.getElementById('btn-invert')?.addEventListener('click', () => {
+    const triggerInvertToggle = () => {
         const active = LayerManager.getActive();
         if (!active) return;
         LayerManager.recordHistory('invert');
         active.isInverted = !active.isInverted;
         document.body.classList.toggle('dark-mode', active.isInverted);
-        flashActionGlow(document.getElementById('btn-invert'), document.getElementById('btn-drawer-invert'));
+        document.getElementById('btn-invert')?.classList.toggle('active', !!active.isInverted);
+        document.getElementById('btn-drawer-invert')?.classList.toggle('active', !!active.isInverted);
         FilterEngine.update();
         LayerManager.saveSession();
-    });
+    };
 
-    document.getElementById('btn-contrast')?.addEventListener('click', () => {
+    const triggerContrastToggle = () => {
         const active = LayerManager.getActive();
         if (!active) return;
         LayerManager.recordHistory('contrast');
         active.isContrast = !active.isContrast;
-        flashActionGlow(document.getElementById('btn-contrast'), document.getElementById('btn-drawer-contrast'));
+        document.getElementById('btn-contrast')?.classList.toggle('active', !!active.isContrast);
+        document.getElementById('btn-drawer-contrast')?.classList.toggle('active', !!active.isContrast);
         FilterEngine.update();
         LayerManager.saveSession();
-    });
+    };
+
+    document.getElementById('btn-invert')?.addEventListener('click', triggerInvertToggle);
+    document.getElementById('btn-drawer-invert')?.addEventListener('click', triggerInvertToggle);
+    document.getElementById('btn-contrast')?.addEventListener('click', triggerContrastToggle);
+    document.getElementById('btn-drawer-contrast')?.addEventListener('click', triggerContrastToggle);
 
     document.getElementById('btn-reset')?.addEventListener('click', () => {
-        flashActionGlow(document.getElementById('btn-reset'), document.getElementById('btn-drawer-reset'));
         GestureEngine.reset();
     });
 
@@ -324,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('rotate_90');
         active.rotation = (Math.round(active.rotation / 90) * 90) + 90;
-        flashActionGlow(document.getElementById('btn-rotate-90'), document.getElementById('btn-toolbar-rotate'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -335,7 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('flip_x');
         active.flipX = (active.flipX || 1) * -1;
-        flashActionGlow(document.getElementById('btn-flip-x'), document.getElementById('btn-toolbar-flip-x'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -346,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('flip_y');
         active.flipY = (active.flipY || 1) * -1;
-        flashActionGlow(document.getElementById('btn-flip-y'), document.getElementById('btn-toolbar-flip-y'));
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -394,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('stencil');
         active.isStencil = !active.isStencil;
-        flashActionGlow(document.getElementById('btn-stencil'), document.getElementById('btn-drawer-stencil'));
+        document.getElementById('btn-stencil')?.classList.toggle('active', !!active.isStencil);
         if (navigator.vibrate) navigator.vibrate(25);
         LayerManager.renderLayer(active);
         LayerManager.saveSession();
@@ -417,14 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-drawer-fullscreen')?.addEventListener('click', () => {
         document.getElementById('btn-fullscreen')?.click();
-    });
-
-    document.getElementById('btn-drawer-invert')?.addEventListener('click', () => {
-        document.getElementById('btn-invert')?.click();
-    });
-
-    document.getElementById('btn-drawer-contrast')?.addEventListener('click', () => {
-        document.getElementById('btn-contrast')?.click();
     });
 
     document.getElementById('btn-drawer-reset')?.addEventListener('click', () => {

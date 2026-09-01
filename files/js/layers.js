@@ -232,34 +232,17 @@ const LayerManager = {
         if (skYVal) skYVal.innerText = `${active.skewY}°`;
 
         const btnInvert = document.getElementById('btn-invert');
-        if (btnInvert) btnInvert.classList.toggle('active', active.isInverted);
+        if (btnInvert) btnInvert.classList.toggle('active', !!active.isInverted);
         const btnContrast = document.getElementById('btn-contrast');
-        if (btnContrast) btnContrast.classList.toggle('active', active.isContrast);
+        if (btnContrast) btnContrast.classList.toggle('active', !!active.isContrast);
 
         const dInvert = document.getElementById('btn-drawer-invert');
-        if (dInvert) dInvert.classList.toggle('active', active.isInverted);
+        if (dInvert) dInvert.classList.toggle('active', !!active.isInverted);
         const dContrast = document.getElementById('btn-drawer-contrast');
-        if (dContrast) dContrast.classList.toggle('active', active.isContrast);
+        if (dContrast) dContrast.classList.toggle('active', !!active.isContrast);
 
         const btnStencil = document.getElementById('btn-stencil');
-        if (btnStencil) btnStencil.classList.toggle('active', active.isStencil);
-        const dStencil = document.getElementById('btn-drawer-stencil');
-        if (dStencil) dStencil.classList.toggle('active', active.isStencil);
-
-        const btnFlipX = document.getElementById('btn-flip-x');
-        if (btnFlipX) btnFlipX.classList.toggle('active', active.flipX === -1);
-        const btnTbFlipX = document.getElementById('btn-toolbar-flip-x');
-        if (btnTbFlipX) btnTbFlipX.classList.toggle('active', active.flipX === -1);
-
-        const btnFlipY = document.getElementById('btn-flip-y');
-        if (btnFlipY) btnFlipY.classList.toggle('active', active.flipY === -1);
-        const btnTbFlipY = document.getElementById('btn-toolbar-flip-y');
-        if (btnTbFlipY) btnTbFlipY.classList.toggle('active', active.flipY === -1);
-
-        const btnRot = document.getElementById('btn-rotate-90');
-        if (btnRot) btnRot.classList.toggle('active', (active.rotation % 360) !== 0);
-        const btnTbRot = document.getElementById('btn-toolbar-rotate');
-        if (btnTbRot) btnTbRot.classList.toggle('active', (active.rotation % 360) !== 0);
+        if (btnStencil) btnStencil.classList.toggle('active', !!active.isStencil);
     },
 
     renderLayer(layer) {
