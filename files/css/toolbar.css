@@ -137,6 +137,10 @@
     fill: currentColor;
 }
 
+.icon-import-rotated {
+    transform: rotate(45deg);
+}
+
 .btn.active {
     color: var(--accent);
     background: var(--accent-glow);

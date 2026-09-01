@@ -142,13 +142,15 @@ const LayerManager = {
 
         layerDiv.addEventListener('pointerdown', (e) => {
             if (GestureEngine.isLocked) return;
-            this.setActive(id);
+            if (this.activeId !== id) {
+                this.setActive(id, false);
+            }
         });
 
         this.layers.push(layerObj);
 
         if (makeActive) {
-            this.setActive(id);
+            this.setActive(id, false);
         }
 
         this.renderLayer(layerObj);
@@ -165,7 +167,7 @@ const LayerManager = {
 
             if (this.activeId === id) {
                 if (this.layers.length > 0) {
-                    this.setActive(this.layers[Math.max(0, idx - 1)].id);
+                    this.setActive(this.layers[Math.max(0, idx - 1)].id, false);
                 } else {
                     this.activeId = null;
                 }
@@ -179,14 +181,14 @@ const LayerManager = {
         return this.layers.find(l => l.id === this.activeId) || this.layers[0] || null;
     },
 
-    setActive(id, bringToFront = true) {
+    setActive(id, bringToFront = false) {
         this.activeId = id;
         const container = document.getElementById('image-container');
         this.layers.forEach(l => {
             if (l.element) {
                 const isActive = l.id === id;
                 l.element.classList.toggle('active-layer', isActive);
-                if (isActive && bringToFront && container && l.element.parentNode === container) {
+                if (isActive && bringToFront && container && l.element.parentNode === container && container.lastElementChild !== l.element) {
                     container.appendChild(l.element);
                 }
             }
@@ -347,7 +349,7 @@ const LayerManager = {
                     `;
 
                     chip.onclick = (e) => {
-                        this.setActive(layer.id);
+                        this.setActive(layer.id, true);
                     };
 
                     chip.querySelector('.layer-chip-del').onclick = (e) => {

@@ -68,8 +68,8 @@ const LocaleEngine = {
             c_video_t: "Animated Intro", c_video_d: "Watch intro video",
 
             byline_tap: "Tap",
-            byline_cam: "camera or",
-            byline_paste: "paste from clipboard to begin",
+            byline_or: "or",
+            byline_paste: "to begin",
             about_desc: "Precision digital tracing table and drafting suite designed for artists, calligraphers, illustrators, and creators.",
             about_creator: "Created by DaidalusX78 (Marc Bailey)",
             video_modal_title: "Animated Intro Sequence",
@@ -226,8 +226,8 @@ const LocaleEngine = {
             c_video_t: "Vídeo Animado", c_video_d: "Ver vídeo de apertura",
 
             byline_tap: "Toca",
-            byline_cam: "cámara o",
-            byline_paste: "pega desde portapapeles para empezar",
+            byline_or: "o",
+            byline_paste: "para empezar",
             about_desc: "Mesa de calco digital y herramienta de dibujo de precisión creada para artistas, ilustradores, calígrafos y creadores.",
             about_creator: "Creado por DaidalusX78 (Marc Bailey)",
             video_modal_title: "Secuencia Animada de Apertura",
@@ -335,7 +335,7 @@ const LocaleEngine = {
                     <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                     <span class="brand-lightbox">Lightbox</span>
                 </span>
-                <span class="version-tag">v0.24</span>
+                <span class="version-tag">v0.25</span>
             `;
         }
 

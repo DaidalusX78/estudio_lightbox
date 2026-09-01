@@ -170,6 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Collection Modal (IndexedDB)
     document.getElementById('btn-save-collection')?.addEventListener('click', () => StorageModule.saveCurrent());
+    document.getElementById('btn-drawer-save')?.addEventListener('click', () => StorageModule.saveCurrent());
+
     document.getElementById('btn-open-collection')?.addEventListener('click', (e) => {
         e.stopPropagation();
         const grid = document.getElementById('library-grid');
@@ -189,10 +191,14 @@ document.addEventListener('DOMContentLoaded', () => {
             items.reverse().forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'library-item';
-                const imgUrl = URL.createObjectURL(item.blob);
-                div.innerHTML = `<img src="${imgUrl}" alt="Reference" /><button class="library-item-del">✕</button>`;
+                const imgSrc = item.blob ? URL.createObjectURL(item.blob) : (item.dataUrl || '');
+                div.innerHTML = `<img src="${imgSrc}" alt="Reference" /><button class="library-item-del" title="Delete">✕</button>`;
                 div.querySelector('img').onclick = () => {
-                    LayerManager.addLayerFromBlob(item.blob, 'Saved Item');
+                    if (item.blob) {
+                        LayerManager.addLayerFromBlob(item.blob, item.name || 'Saved Item');
+                    } else if (item.dataUrl) {
+                        LayerManager.createLayer(null, item.dataUrl, item.name || 'Saved Item', null, true);
+                    }
                     collectionModal.style.display = 'none';
                 };
                 div.querySelector('.library-item-del').onclick = (ev) => {

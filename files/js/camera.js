@@ -28,20 +28,35 @@ const CameraEngine = {
         const welcomeSlate = document.getElementById('welcome-slate');
 
         if (this.isActive) {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert(LocaleEngine.currentLang === 'es' ? 'La cámara no es compatible o requiere una conexión segura (HTTPS).' : 'Camera API is not supported on this browser or requires a secure connection (HTTPS / localhost).');
+            const getUserMedia = (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+                ? (c) => navigator.mediaDevices.getUserMedia(c)
+                : (navigator.getUserMedia
+                    ? (c) => new Promise((res, rej) => navigator.getUserMedia.call(navigator, c, res, rej))
+                    : (navigator.webkitGetUserMedia
+                        ? (c) => new Promise((res, rej) => navigator.webkitGetUserMedia.call(navigator, c, res, rej))
+                        : null));
+
+            if (!getUserMedia) {
+                const isHttpLan = location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+                if (isHttpLan) {
+                    alert(LocaleEngine.currentLang === 'es'
+                        ? 'Los navegadores web exigen HTTPS o la app instalada (APK/PWA) para encender la cámara en red Wi-Fi.'
+                        : 'Web browsers require HTTPS, localhost, or the installed APK/PWA to enable the camera over local Wi-Fi.');
+                } else {
+                    alert(LocaleEngine.currentLang === 'es' ? 'La cámara no es compatible en este navegador.' : 'Camera API is not supported on this browser.');
+                }
                 this.isActive = false;
                 if (btnCamera) btnCamera.classList.remove('active');
                 return;
             }
             try {
                 try {
-                    this.mediaStream = await navigator.mediaDevices.getUserMedia({
+                    this.mediaStream = await getUserMedia({
                         video: { facingMode: { ideal: "environment" } },
                         audio: false
                     });
                 } catch (envErr) {
-                    this.mediaStream = await navigator.mediaDevices.getUserMedia({
+                    this.mediaStream = await getUserMedia({
                         video: true,
                         audio: false
                     });

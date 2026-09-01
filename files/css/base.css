@@ -30,6 +30,9 @@ body.dark-mode {
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #image-container {
@@ -39,6 +42,7 @@ body.dark-mode {
     align-items: center;
     justify-content: center;
     pointer-events: none;
+    touch-action: none;
 }
 
 .canvas-layer {
@@ -46,6 +50,7 @@ body.dark-mode {
     transform-origin: center center;
     will-change: transform, filter;
     pointer-events: auto;
+    touch-action: none;
     cursor: grab;
     transition: box-shadow 0.2s ease;
 }
@@ -263,37 +268,38 @@ body.dark-mode .brand-title-wrap {
 }
 
 #welcome-slate p.byline {
-    font-size: 14px;
+    font-size: clamp(20px, 3.2vw, 26px);
     font-weight: 400;
-    color: var(--text-dim);
+    color: var(--accent);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    margin-top: -2px;
-    opacity: 0.85;
+    gap: 10px;
+    padding-top: 14px;
+    margin-top: 4px;
+    letter-spacing: 0.01em;
 }
 
 body.dark-mode #welcome-slate p.byline {
-    color: var(--text-muted);
+    color: var(--accent);
 }
 
 .byline-icon-svg {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    background: rgba(56, 189, 248, 0.12);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.16);
     color: var(--accent);
-    padding: 3px;
+    padding: 4px;
     vertical-align: middle;
 }
 
 .byline-icon-svg svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     fill: currentColor;
 }
 
