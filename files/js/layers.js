@@ -273,7 +273,7 @@ const LayerManager = {
         const srcImg = (layer.rawImage && layer.rawImage.width) ? layer.rawImage : (layer.imgElem && layer.imgElem.naturalWidth ? layer.imgElem : null);
         if (!srcImg) return;
         const canvas = layer.canvasElem;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const imgW = srcImg.naturalWidth || srcImg.width || 800;
         const imgH = srcImg.naturalHeight || srcImg.height || 600;
         const w = Math.min(imgW, 1200);
