@@ -107,18 +107,25 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: clamp(2px, 1.2vw, 6px);
+    gap: 6px;
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 5px clamp(6px, 1.5vw, 10px);
+    padding: 6px 10px;
     border-radius: 40px;
     border: 1px solid var(--border);
     z-index: 100;
     transition: opacity 0.25s ease, transform 0.25s ease;
     max-width: calc(100vw - 16px);
     box-sizing: border-box;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: none;
+}
+
+#toolbar::-webkit-scrollbar {
+    display: none;
 }
 
 .toolbar-locked {
@@ -132,9 +139,8 @@
     border: none;
     outline: none;
     color: var(--text-muted);
-    width: clamp(34px, 8.6vw, 42px);
-    height: clamp(34px, 8.6vw, 42px);
-    min-width: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -146,8 +152,8 @@
 }
 
 .btn svg {
-    width: clamp(18px, 4.6vw, 22px);
-    height: clamp(18px, 4.6vw, 22px);
+    width: 22px;
+    height: 22px;
     fill: currentColor;
 }
 
@@ -161,10 +167,13 @@
 }
 
 @keyframes actionPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
         background: transparent;
     }
+
     50% {
         box-shadow: 0 0 14px 2px rgba(56, 189, 248, 0.45);
         background: rgba(56, 189, 248, 0.15);
@@ -184,41 +193,25 @@
     flex-shrink: 0;
 }
 
+#btn-help,
+#btn-lock,
 .btn-lock {
     background: var(--accent);
     color: var(--bg-card);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    margin: 0;
+    padding: 0;
 }
 
-.btn-lock svg {
-    width: 22px;
-    height: 22px;
-    fill: currentColor;
-}
-
+#btn-help:hover,
+#btn-lock:hover,
 .btn-lock:hover {
     background: var(--accent-hover);
     color: var(--bg-card-hover);
 }
 
 #btn-help {
-    background: var(--accent);
-    color: var(--bg-card);
     font-size: 17px;
     font-weight: 700;
-}
-
-#btn-help:hover {
-    background: var(--accent-hover);
-    color: var(--bg-card-hover);
 }
 
 .icon-import-rotated {
@@ -302,24 +295,6 @@
         height: 20px;
     }
 
-    .btn-lock {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        border-radius: 50%;
-        gap: 0;
-        justify-content: center;
-    }
-
-    .btn-lock span {
-        display: none;
-    }
-
-    .btn-lock svg {
-        width: 20px;
-        height: 20px;
-    }
-
     #welcome-slate {
         gap: 12px;
         transform: translateY(-20px);
@@ -359,16 +334,6 @@
         font-size: 15px;
     }
 
-    .btn-lock {
-        width: 36px;
-        height: 36px;
-    }
-
-    .btn-lock svg {
-        width: 18px;
-        height: 18px;
-    }
-
     .hero-app-logo {
         width: 220px;
         height: 220px;
@@ -394,21 +359,6 @@
     }
 
     .btn svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    .btn-lock {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .btn-lock svg {
         width: 20px;
         height: 20px;
     }
