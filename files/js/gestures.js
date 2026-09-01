@@ -20,7 +20,15 @@ const GestureEngine = {
 
         viewport.addEventListener('pointerdown', (e) => {
             if (this.isLocked) return;
-            this.activePointers.set(e.pointerId, e);
+            if (e.target.closest('#toolbar, #layer-selector-bar, .modal, .slider-popup, .drawer, #btn-camera-shutter, #ruler-overlay, .library-modal')) {
+                return;
+            }
+
+            try {
+                viewport.setPointerCapture(e.pointerId);
+            } catch (err) {}
+
+            this.activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
 
             const active = LayerManager.getActive();
             const isLayerTarget = e.target && e.target.closest && e.target.closest('.canvas-layer');
@@ -50,7 +58,7 @@ const GestureEngine = {
 
         viewport.addEventListener('pointermove', (e) => {
             if (this.isLocked || !this.activePointers.has(e.pointerId)) return;
-            this.activePointers.set(e.pointerId, e);
+            this.activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
 
             if (this.targetMode === 'camera' && typeof CameraEngine !== 'undefined' && CameraEngine.isActive) {
                 if (this.activePointers.size === 1) {
@@ -79,8 +87,10 @@ const GestureEngine = {
             }
 
             if (this.activePointers.size === 1) {
-                active.translateX += e.clientX - this.lastPanX;
-                active.translateY += e.clientY - this.lastPanY;
+                const deltaX = e.clientX - this.lastPanX;
+                const deltaY = e.clientY - this.lastPanY;
+                active.translateX += deltaX;
+                active.translateY += deltaY;
                 this.lastPanX = e.clientX;
                 this.lastPanY = e.clientY;
                 this.requestRender();
@@ -100,6 +110,10 @@ const GestureEngine = {
         });
 
         const endPointer = (e) => {
+            try {
+                viewport.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+
             this.activePointers.delete(e.pointerId);
             if (this.activePointers.size === 1) {
                 const rem = Array.from(this.activePointers.values())[0];
@@ -108,6 +122,7 @@ const GestureEngine = {
             } else if (this.activePointers.size === 0) {
                 this.initialDistance = null;
                 this.initialAngle = null;
+                this.hasMoved = false;
                 if (this.targetMode === 'layer') {
                     LayerManager.saveSession();
                 }

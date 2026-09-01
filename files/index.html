@@ -53,9 +53,15 @@
             </div>
             <p class="byline" id="txt-slate-byline">
                 <span data-i18n="byline_tap">Tap</span>
-                <span class="byline-icon-svg"><svg class="icon-import-rotated" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" /></svg></span>
+                <span class="byline-icon-svg"><svg viewBox="0 0 24 24">
+                        <path
+                            d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" />
+                    </svg></span>
                 <span data-i18n="byline_or">or</span>
-                <span class="byline-icon-svg"><svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" /></svg></span>
+                <span class="byline-icon-svg"><svg class="icon-import-rotated" viewBox="0 0 24 24">
+                        <path
+                            d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                    </svg></span>
                 <span data-i18n="byline_paste">to begin</span>
             </p>
         </div>
@@ -98,163 +104,211 @@
             <div class="guide-sections-grid">
                 <!-- Category 1: Tracing & Canvas -->
                 <div class="guide-section">
-                <div class="guide-section-title" data-i18n="sec_tracing">Tracing &amp; Canvas</div>
-                <div class="guide-grid">
-                    <div class="guide-pill" onclick="openCardModal('lock')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z" /></svg>
+                    <div class="guide-section-title" data-i18n="sec_tracing">Tracing &amp; Canvas</div>
+                    <div class="guide-grid">
+                        <div class="guide-pill" onclick="openCardModal('lock')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_lock_t">Touch Lock</span>
+                            <span class="desc" data-i18n="c_lock_d">Freeze to trace</span>
                         </div>
-                        <span class="title" data-i18n="c_lock_t">Touch Lock</span>
-                        <span class="desc" data-i18n="c_lock_d">Freeze to trace</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('stencil')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('stencil')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_stencil_t">Stenciler</span>
+                            <span class="desc" data-i18n="c_stencil_d">Turn into lines</span>
                         </div>
-                        <span class="title" data-i18n="c_stencil_t">Stenciler</span>
-                        <span class="desc" data-i18n="c_stencil_d">Turn into lines</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('ruler')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M2 4v16h20V4H2zm18 14H4V6h3v4h2V6h2v2h2V6h2v4h2V6h3v12z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('ruler')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M2 4v16h20V4H2zm18 14H4V6h3v4h2V6h2v2h2V6h2v4h2V6h3v12z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_ruler_t">1:1 Ruler</span>
+                            <span class="desc" data-i18n="c_ruler_d">True screen scale</span>
                         </div>
-                        <span class="title" data-i18n="c_ruler_t">1:1 Ruler</span>
-                        <span class="desc" data-i18n="c_ruler_d">True screen scale</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('camera')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('camera')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_camera_t">Live Camera</span>
+                            <span class="desc" data-i18n="c_camera_d">Trace real world</span>
                         </div>
-                        <span class="title" data-i18n="c_camera_t">Live Camera</span>
-                        <span class="desc" data-i18n="c_camera_d">Trace real world</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Category 2: Lighting & Contrast -->
-            <div class="guide-section">
-                <div class="guide-section-title" data-i18n="sec_lighting">Lighting &amp; Contrast</div>
-                <div class="guide-grid">
-                    <div class="guide-pill" onclick="openCardModal('brightness')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" /></svg>
+                <!-- Category 2: Lighting & Contrast -->
+                <div class="guide-section">
+                    <div class="guide-section-title" data-i18n="sec_lighting">Lighting &amp; Contrast</div>
+                    <div class="guide-grid">
+                        <div class="guide-pill" onclick="openCardModal('brightness')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_brightness_t">Luminance</span>
+                            <span class="desc" data-i18n="c_brightness_d">Slider &amp; number</span>
                         </div>
-                        <span class="title" data-i18n="c_brightness_t">Luminance</span>
-                        <span class="desc" data-i18n="c_brightness_d">Slider &amp; number</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('tint')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('tint')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_tint_t">Warm Light</span>
+                            <span class="desc" data-i18n="c_tint_d">Eye comfort tone</span>
                         </div>
-                        <span class="title" data-i18n="c_tint_t">Warm Light</span>
-                        <span class="desc" data-i18n="c_tint_d">Eye comfort tone</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('invert')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 4.07C7.62 4.07 4.07 7.62 4.07 12S7.62 19.93 12 19.93s7.93-3.55 7.93-7.93S16.38 4.07 12 4.07zm0 13.86V6.07c3.3 0 5.93 2.64 5.93 5.93 0 3.3-2.63 5.93-5.93 5.93z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('invert')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 4.07C7.62 4.07 4.07 7.62 4.07 12S7.62 19.93 12 19.93s7.93-3.55 7.93-7.93S16.38 4.07 12 4.07zm0 13.86V6.07c3.3 0 5.93 2.64 5.93 5.93 0 3.3-2.63 5.93-5.93 5.93z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_invert_t">Invert Colors</span>
+                            <span class="desc" data-i18n="c_invert_d">Negative mode</span>
                         </div>
-                        <span class="title" data-i18n="c_invert_t">Invert Colors</span>
-                        <span class="desc" data-i18n="c_invert_d">Negative mode</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('contrast')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.86 0 7-3.14 7-7s-3.14-7-7-7z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('contrast')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.86 0 7-3.14 7-7s-3.14-7-7-7z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_contrast_t">Contrast Boost</span>
+                            <span class="desc" data-i18n="c_contrast_d">Crisp outlines</span>
                         </div>
-                        <span class="title" data-i18n="c_contrast_t">Contrast Boost</span>
-                        <span class="desc" data-i18n="c_contrast_d">Crisp outlines</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category 3: Geometry & Alignment -->
-            <div class="guide-section">
-                <div class="guide-section-title" data-i18n="sec_geometry">Geometry &amp; Alignment</div>
-                <div class="guide-grid">
-                    <div class="guide-pill" onclick="openCardModal('keystone')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M4 4l3 16h10l3-16H4zm4.2 14l-1.5-12h10.6l-1.5 12H8.2z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_keystone_t">Keystone</span>
-                        <span class="desc" data-i18n="c_keystone_d">Perspective tilt</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openCardModal('rotate')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_rotate_t">Rotate &amp; Flip</span>
-                        <span class="desc" data-i18n="c_rotate_d">90° &amp; mirror</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openCardModal('grid')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_grid_t">Custom Grid</span>
-                        <span class="desc" data-i18n="c_grid_d">Scale &amp; line rules</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Category 4: Media & Storage -->
-            <div class="guide-section">
-                <div class="guide-section-title" data-i18n="sec_media">Media &amp; Storage</div>
-                <div class="guide-grid">
-                    <div class="guide-pill" onclick="openCardModal('paste')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" /></svg>
+                <!-- Category 3: Geometry & Alignment -->
+                <div class="guide-section">
+                    <div class="guide-section-title" data-i18n="sec_geometry">Geometry &amp; Alignment</div>
+                    <div class="guide-grid">
+                        <div class="guide-pill" onclick="openCardModal('keystone')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4l3 16h10l3-16H4zm4.2 14l-1.5-12h10.6l-1.5 12H8.2z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_keystone_t">Keystone</span>
+                            <span class="desc" data-i18n="c_keystone_d">Perspective tilt</span>
                         </div>
-                        <span class="title" data-i18n="c_paste_t">Paste</span>
-                        <span class="desc" data-i18n="c_paste_d">From clipboard</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('import')">
-                        <div class="guide-pill-icon">
-                            <svg class="icon-import-rotated" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('rotate')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_rotate_t">Rotate &amp; Flip</span>
+                            <span class="desc" data-i18n="c_rotate_d">90° &amp; mirror</span>
                         </div>
-                        <span class="title" data-i18n="c_import_t">Import File</span>
-                        <span class="desc" data-i18n="c_import_d">Open photo / SVG</span>
-                    </div>
 
-                    <div class="guide-pill" onclick="openCardModal('collection')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" /></svg>
+                        <div class="guide-pill" onclick="openCardModal('grid')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_grid_t">Custom Grid</span>
+                            <span class="desc" data-i18n="c_grid_d">Scale &amp; line rules</span>
                         </div>
-                        <span class="title" data-i18n="c_collection_t">My Collection</span>
-                        <span class="desc" data-i18n="c_collection_d">Saved library</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openCardModal('save')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_save_t">Save Drawing</span>
-                        <span class="desc" data-i18n="c_save_d">Bookmark canvas</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openCardModal('layers')">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9.07l-9-7-9 7 1.63 1.27L12 16z" /></svg>
-                        </div>
-                        <span class="title" data-i18n="c_layers_t">Multi-Layers</span>
-                        <span class="desc" data-i18n="c_layers_d">Combine images</span>
-                    </div>
-
-                    <div class="guide-pill" onclick="openVideoModal()">
-                        <div class="guide-pill-icon">
-                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                        <span class="title" data-i18n="c_video_t">Animated Intro</span>
-                        <span class="desc" data-i18n="c_video_d">Watch intro video</span>
                     </div>
                 </div>
-            </div>
+
+                <!-- Category 4: Media & Storage -->
+                <div class="guide-section">
+                    <div class="guide-section-title" data-i18n="sec_media">Media &amp; Storage</div>
+                    <div class="guide-grid">
+                        <div class="guide-pill" onclick="openCardModal('paste')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_paste_t">Paste</span>
+                            <span class="desc" data-i18n="c_paste_d">From clipboard</span>
+                        </div>
+
+                        <div class="guide-pill" onclick="openCardModal('import')">
+                            <div class="guide-pill-icon">
+                                <svg class="icon-import-rotated" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_import_t">Import File</span>
+                            <span class="desc" data-i18n="c_import_d">Open photo / SVG</span>
+                        </div>
+
+                        <div class="guide-pill" onclick="openCardModal('collection')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_collection_t">My Collection</span>
+                            <span class="desc" data-i18n="c_collection_d">Saved library</span>
+                        </div>
+
+                        <div class="guide-pill" onclick="openCardModal('save')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_save_t">Save Drawing</span>
+                            <span class="desc" data-i18n="c_save_d">Bookmark canvas</span>
+                        </div>
+
+                        <div class="guide-pill" onclick="openCardModal('layers')">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9.07l-9-7-9 7 1.63 1.27L12 16z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_layers_t">Multi-Layers</span>
+                            <span class="desc" data-i18n="c_layers_d">Combine images</span>
+                        </div>
+
+                        <div class="guide-pill" onclick="openVideoModal()">
+                            <div class="guide-pill-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </div>
+                            <span class="title" data-i18n="c_video_t">Animated Intro</span>
+                            <span class="desc" data-i18n="c_video_d">Watch intro video</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- About eStudio Lightbox -->
@@ -265,9 +319,11 @@
                         <span class="brand-lightbox">Lightbox</span>
                         <span class="version-tag">v0.25</span>
                     </span>
-                    <span class="guide-about-creator" data-i18n="about_creator">Created by DaidalusX78 (Marc Bailey)</span>
+                    <span class="guide-about-creator" data-i18n="about_creator">Created by DaidalusX78 (Marc
+                        Bailey)</span>
                 </div>
-                <div data-i18n="about_desc">Precision digital tracing table and drafting suite designed for artists, calligraphers, illustrators, and creators.</div>
+                <div data-i18n="about_desc">Precision digital tracing table and drafting suite designed for artists,
+                    calligraphers, illustrators, and creators.</div>
             </div>
         </div>
     </div>
@@ -623,7 +679,9 @@
         <div class="video-modal-card">
             <div class="video-modal-header">
                 <h4>
-                    <svg style="width:18px;height:18px;fill:var(--accent);" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg style="width:18px;height:18px;fill:var(--accent);" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
                     <span data-i18n="video_modal_title">Animated Intro Sequence</span>
                 </h4>
                 <button class="btn-cancel" onclick="closeVideoModal()" style="padding:6px 12px;">✕</button>

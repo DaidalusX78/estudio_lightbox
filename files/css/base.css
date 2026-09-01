@@ -52,6 +52,9 @@ body.dark-mode {
     pointer-events: auto;
     touch-action: none;
     cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
     transition: box-shadow 0.2s ease;
 }
 
