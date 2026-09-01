@@ -107,25 +107,18 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: clamp(2px, 1.2vw, 6px);
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 6px 10px;
+    padding: 5px clamp(6px, 1.5vw, 10px);
     border-radius: 40px;
     border: 1px solid var(--border);
     z-index: 100;
     transition: opacity 0.25s ease, transform 0.25s ease;
     max-width: calc(100vw - 16px);
     box-sizing: border-box;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    scrollbar-width: none;
-}
-
-#toolbar::-webkit-scrollbar {
-    display: none;
 }
 
 .toolbar-locked {
@@ -139,8 +132,9 @@
     border: none;
     outline: none;
     color: var(--text-muted);
-    width: 44px;
-    height: 44px;
+    width: clamp(34px, 8.6vw, 42px);
+    height: clamp(34px, 8.6vw, 42px);
+    min-width: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -152,8 +146,8 @@
 }
 
 .btn svg {
-    width: 22px;
-    height: 22px;
+    width: clamp(18px, 4.6vw, 22px);
+    height: clamp(18px, 4.6vw, 22px);
     fill: currentColor;
 }
 

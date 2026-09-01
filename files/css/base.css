@@ -270,7 +270,7 @@ body.dark-mode .brand-title-wrap {
 }
 
 #welcome-slate p.byline {
-    font-size: clamp(20px, 3.2vw, 26px);
+    font-size: clamp(20px, 2vw, 20px);
     font-weight: 400;
     color: var(--dark);
     display: inline-flex;
