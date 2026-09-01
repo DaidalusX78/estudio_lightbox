@@ -178,8 +178,7 @@ body.dark-mode {
 @keyframes lightboxTurnOn {
     0% {
         opacity: 0;
-        filter: brightness(0.5) saturate(0.6);
-        transform: scale(0.98);
+        filter: brightness(0.6) saturate(0.7);
     }
 
     60% {
@@ -189,12 +188,11 @@ body.dark-mode {
     100% {
         opacity: 1;
         filter: brightness(1) saturate(1);
-        transform: scale(1);
     }
 }
 
 .canvas-layer.layer-enter {
-    animation: lightboxTurnOn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: lightboxTurnOn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* --- Minimalist Welcome Slate --- */

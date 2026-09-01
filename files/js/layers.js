@@ -111,6 +111,10 @@ const LayerManager = {
         canvas.style.display = 'none';
         layerDiv.appendChild(canvas);
 
+        layerDiv.addEventListener('animationend', () => {
+            layerDiv.classList.remove('layer-enter');
+        }, { once: true });
+
         container.appendChild(layerDiv);
 
         const layerObj = {
