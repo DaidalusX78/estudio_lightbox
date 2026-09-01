@@ -193,7 +193,7 @@ const LayerManager = {
             if (l.element) {
                 const isActive = l.id === id;
                 l.element.classList.toggle('active-layer', isActive);
-                if (isActive && bringToFront && container && l.element.parentNode === container && container.lastElementChild !== l.element) {
+                if (isActive && bringToFront && container && l.element.parentNode === container) {
                     container.appendChild(l.element);
                 }
             }
@@ -280,7 +280,6 @@ const LayerManager = {
             layer.canvasElem.style.display = 'none';
             layer.imgElem.style.display = 'block';
         }
-        this.syncActiveControls();
     },
 
     applySobel(layer) {

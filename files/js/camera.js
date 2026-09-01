@@ -36,15 +36,10 @@ const CameraEngine = {
                         ? (c) => new Promise((res, rej) => navigator.webkitGetUserMedia.call(navigator, c, res, rej))
                         : null));
 
-            if (!getUserMedia) {
-                const isHttpLan = location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
-                if (isHttpLan) {
-                    alert(LocaleEngine.currentLang === 'es'
-                        ? 'Los navegadores web exigen HTTPS o la app instalada (APK/PWA) para encender la cámara en red Wi-Fi.'
-                        : 'Web browsers require HTTPS, localhost, or the installed APK/PWA to enable the camera over local Wi-Fi.');
-                } else {
-                    alert(LocaleEngine.currentLang === 'es' ? 'La cámara no es compatible en este navegador.' : 'Camera API is not supported on this browser.');
-                }
+            if (!getUserMedia || (typeof window.isSecureContext !== 'undefined' && !window.isSecureContext)) {
+                alert(LocaleEngine.currentLang === 'es'
+                    ? 'La cámara requiere un contexto seguro (HTTPS o localhost). En el navegador Chrome, abre la app desde http://localhost:5500 o pruébala directamente en la APK instalada.'
+                    : 'Camera requires a Secure Context (HTTPS or localhost). In Chrome, please open the app via http://localhost:5500 instead of a remote IP, or test directly on the installed Android APK.');
                 this.isActive = false;
                 if (btnCamera) btnCamera.classList.remove('active');
                 return;

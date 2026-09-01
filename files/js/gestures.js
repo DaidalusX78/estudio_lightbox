@@ -26,8 +26,13 @@ const GestureEngine = {
 
             this.activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
 
+            const layerElem = e.target && e.target.closest && e.target.closest('.canvas-layer');
+            if (layerElem && layerElem.id) {
+                LayerManager.setActive(layerElem.id, false);
+            }
+
             const active = LayerManager.getActive();
-            const isLayerTarget = e.target && e.target.closest && e.target.closest('.canvas-layer');
+            const isLayerTarget = !!layerElem;
 
             if (typeof CameraEngine !== 'undefined' && CameraEngine.isActive && (!active || !isLayerTarget)) {
                 this.targetMode = 'camera';
@@ -136,9 +141,12 @@ const GestureEngine = {
                 this.initialAngle = null;
                 this.initialMidX = null;
                 this.initialMidY = null;
-                this.hasMoved = false;
-                if (this.targetMode === 'layer') {
-                    LayerManager.saveSession();
+                if (this.hasMoved) {
+                    this.hasMoved = false;
+                    if (this.targetMode === 'layer') {
+                        LayerManager.syncActiveControls();
+                        LayerManager.saveSession();
+                    }
                 }
             }
         };

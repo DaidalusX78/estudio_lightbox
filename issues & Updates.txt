@@ -1,5 +1,5 @@
 v0.28
-1) 
+1) Toolbar - import icon rotate -135 degrees.
 
 execute v0.28 and commit
 

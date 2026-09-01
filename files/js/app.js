@@ -401,10 +401,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-contrast')?.click();
     });
 
-    document.getElementById('btn-drawer-save')?.addEventListener('click', () => {
-        StorageModule.saveCurrent();
-    });
-
     document.getElementById('btn-drawer-reset')?.addEventListener('click', () => {
         document.getElementById('btn-reset')?.click();
     });

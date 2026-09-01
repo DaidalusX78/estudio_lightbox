@@ -20,12 +20,17 @@ const StorageModule = {
         };
     },
 
+    isSaving: false,
+
     async saveCurrent() {
+        if (this.isSaving) return;
         const active = LayerManager.getActive();
         if (!active || (!active.dataUrl && !active.blob)) {
             alert(LocaleEngine.currentLang === 'es' ? 'No hay ninguna imagen cargada en la pantalla.' : 'No active image loaded on canvas to save.');
             return;
         }
+
+        this.isSaving = true;
 
         const saveData = {
             dataUrl: active.dataUrl,
@@ -54,14 +59,17 @@ const StorageModule = {
                 const store = tx.objectStore(this.STORE_NAME);
                 const req = store.add(saveData);
                 req.onsuccess = () => {
+                    this.isSaving = false;
                     if (navigator.vibrate) navigator.vibrate(30);
                     alert(LocaleEngine.i18n[LocaleEngine.currentLang].msg_saved_collection);
                 };
                 req.onerror = (err) => {
+                    this.isSaving = false;
                     console.error('Save error:', err);
                     alert(LocaleEngine.currentLang === 'es' ? 'Error al guardar en la colección.' : 'Error saving to collection.');
                 };
             } catch (e) {
+                this.isSaving = false;
                 console.error('Transaction error:', e);
                 alert(LocaleEngine.currentLang === 'es' ? 'Error al guardar en la colección.' : 'Error saving to collection.');
             }
@@ -74,6 +82,10 @@ const StorageModule = {
             req.onsuccess = (e) => {
                 this.db = e.target.result;
                 doSave(this.db);
+            };
+            req.onerror = () => {
+                this.isSaving = false;
+                alert(LocaleEngine.currentLang === 'es' ? 'Error al guardar en la colección.' : 'Error saving to collection.');
             };
         }
     },

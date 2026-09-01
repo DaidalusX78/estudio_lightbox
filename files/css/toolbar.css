@@ -208,7 +208,7 @@
 }
 
 .icon-import-rotated {
-    transform: rotate(45deg);
+    transform: rotate(-135deg);
     display: inline-block;
 }
 
