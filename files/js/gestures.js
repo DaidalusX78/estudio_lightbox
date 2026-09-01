@@ -24,10 +24,6 @@ const GestureEngine = {
                 return;
             }
 
-            try {
-                viewport.setPointerCapture(e.pointerId);
-            } catch (err) {}
-
             this.activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
 
             const active = LayerManager.getActive();
@@ -47,11 +43,18 @@ const GestureEngine = {
                 const [p1, p2] = Array.from(this.activePointers.values());
                 this.initialDistance = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
                 this.initialAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+                this.initialMidX = (p1.clientX + p2.clientX) / 2;
+                this.initialMidY = (p1.clientY + p2.clientY) / 2;
+
                 if (this.targetMode === 'camera' && typeof CameraEngine !== 'undefined') {
                     this.startScale = CameraEngine.scale;
+                    this.startPanX = CameraEngine.translateX;
+                    this.startPanY = CameraEngine.translateY;
                 } else if (active) {
                     this.startScale = active.scale;
                     this.startRotation = active.rotation;
+                    this.startPanX = active.translateX;
+                    this.startPanY = active.translateY;
                 }
             }
         });
@@ -70,10 +73,17 @@ const GestureEngine = {
                 } else if (this.activePointers.size === 2) {
                     const [p1, p2] = Array.from(this.activePointers.values());
                     const curDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+                    const curMidX = (p1.clientX + p2.clientX) / 2;
+                    const curMidY = (p1.clientY + p2.clientY) / 2;
+
                     if (this.initialDistance && curDist) {
                         CameraEngine.scale = Math.min(Math.max(this.startScale * (curDist / this.initialDistance), 1.0), 8.0);
-                        CameraEngine.renderTransform();
                     }
+                    if (this.initialMidX !== undefined && this.startPanX !== undefined) {
+                        CameraEngine.translateX = this.startPanX + (curMidX - this.initialMidX);
+                        CameraEngine.translateY = this.startPanY + (curMidY - this.initialMidY);
+                    }
+                    CameraEngine.renderTransform();
                 }
                 return;
             }
@@ -98,6 +108,8 @@ const GestureEngine = {
                 const [p1, p2] = Array.from(this.activePointers.values());
                 const curDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
                 const curAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+                const curMidX = (p1.clientX + p2.clientX) / 2;
+                const curMidY = (p1.clientY + p2.clientY) / 2;
 
                 if (this.initialDistance && curDist) {
                     active.scale = Math.min(Math.max(this.startScale * (curDist / this.initialDistance), 0.15), 12);
@@ -105,15 +117,15 @@ const GestureEngine = {
                 if (this.initialAngle !== null && curAngle !== null) {
                     active.rotation = this.startRotation + (curAngle - this.initialAngle);
                 }
+                if (this.initialMidX !== undefined && this.startPanX !== undefined) {
+                    active.translateX = this.startPanX + (curMidX - this.initialMidX);
+                    active.translateY = this.startPanY + (curMidY - this.initialMidY);
+                }
                 this.requestRender();
             }
         });
 
         const endPointer = (e) => {
-            try {
-                viewport.releasePointerCapture(e.pointerId);
-            } catch (err) {}
-
             this.activePointers.delete(e.pointerId);
             if (this.activePointers.size === 1) {
                 const rem = Array.from(this.activePointers.values())[0];
@@ -122,6 +134,8 @@ const GestureEngine = {
             } else if (this.activePointers.size === 0) {
                 this.initialDistance = null;
                 this.initialAngle = null;
+                this.initialMidX = null;
+                this.initialMidY = null;
                 this.hasMoved = false;
                 if (this.targetMode === 'layer') {
                     LayerManager.saveSession();

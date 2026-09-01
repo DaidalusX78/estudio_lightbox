@@ -1,17 +1,23 @@
-v0.14a
-1) overflow-drawer - Can you fix drawer-action-btn to all be the same size and shape.
-2) Please remove the circular frame from around the hero-app-logo. Also triple the hero-app-logo size
-3) 
+v0.28
+1) 
+
+execute v0.28 and commit
 
 
 
+App icon edits
+
+1) Required  droid app edits: 
+Top (Core): #ffffff / #f3e5f5 | Thin stroke (~2px - 3.2px) | 100% Opacity — The hot center of the neon tube.
+Middle (Inner Glow): #d500f9 (Magenta/Purple) | Medium stroke (~5px - 6.5px / 12px) | Saturated bleeding gas color.
+Bottom (Outer Glow): #aa00ff (Deep Purple) | Thick stroke (~15px - 22px) | 50%–70% Opacity — Ambient glow.
+2) android app icon - neon e needs to be reduced in size.
+3) Opera logo dimensions look to be good to match.
 
 
+Splash Screen
 
-Neon
+1) Logo looks to be a very low resolution quality .
 
-Layer / ObjectStroke Color (Hex)Stroke Width Blur % Opacity % Purpose
-Top (Core)#ffffff (White) or #f3e5f5 Thin (e.g., 2px) 0% 100%The intense, hot center of the tube.
-Middle (Inner Glow) #d500f9 (Bright Magenta/Purple)Medium (e.g., 5px) 2% – 5% 100% The saturated gas color bleeding out.
-Bottom (Outer Glow) #aa00ff (Deep Purple)Thick (e.g., 15px) 15% – 25% 50% – 70% The ambient light casting onto the wall.
+
 

@@ -138,6 +138,11 @@ const LayerManager = {
         };
 
         layerObj.rawImage.crossOrigin = "anonymous";
+        layerObj.rawImage.onload = () => {
+            if (layerObj.isStencil) {
+                this.renderLayer(layerObj);
+            }
+        };
         layerObj.rawImage.src = dataUrl;
 
         layerDiv.addEventListener('pointerdown', (e) => {
@@ -234,10 +239,23 @@ const LayerManager = {
 
         const btnStencil = document.getElementById('btn-stencil');
         if (btnStencil) btnStencil.classList.toggle('active', active.isStencil);
+        const dStencil = document.getElementById('btn-drawer-stencil');
+        if (dStencil) dStencil.classList.toggle('active', active.isStencil);
+
         const btnFlipX = document.getElementById('btn-flip-x');
         if (btnFlipX) btnFlipX.classList.toggle('active', active.flipX === -1);
+        const btnTbFlipX = document.getElementById('btn-toolbar-flip-x');
+        if (btnTbFlipX) btnTbFlipX.classList.toggle('active', active.flipX === -1);
+
         const btnFlipY = document.getElementById('btn-flip-y');
         if (btnFlipY) btnFlipY.classList.toggle('active', active.flipY === -1);
+        const btnTbFlipY = document.getElementById('btn-toolbar-flip-y');
+        if (btnTbFlipY) btnTbFlipY.classList.toggle('active', active.flipY === -1);
+
+        const btnRot = document.getElementById('btn-rotate-90');
+        if (btnRot) btnRot.classList.toggle('active', (active.rotation % 360) !== 0);
+        const btnTbRot = document.getElementById('btn-toolbar-rotate');
+        if (btnTbRot) btnTbRot.classList.toggle('active', (active.rotation % 360) !== 0);
     },
 
     renderLayer(layer) {
@@ -262,19 +280,23 @@ const LayerManager = {
             layer.canvasElem.style.display = 'none';
             layer.imgElem.style.display = 'block';
         }
+        this.syncActiveControls();
     },
 
     applySobel(layer) {
-        if (!layer.rawImage.src || !layer.rawImage.width) return;
+        const srcImg = (layer.rawImage && layer.rawImage.width) ? layer.rawImage : (layer.imgElem && layer.imgElem.naturalWidth ? layer.imgElem : null);
+        if (!srcImg) return;
         const canvas = layer.canvasElem;
         const ctx = canvas.getContext('2d');
-        const w = Math.min(layer.rawImage.width, 1200);
-        const h = (layer.rawImage.height / layer.rawImage.width) * w;
+        const imgW = srcImg.naturalWidth || srcImg.width || 800;
+        const imgH = srcImg.naturalHeight || srcImg.height || 600;
+        const w = Math.min(imgW, 1200);
+        const h = (imgH / imgW) * w;
         canvas.width = w;
         canvas.height = h;
 
         try {
-            ctx.drawImage(layer.rawImage, 0, 0, w, h);
+            ctx.drawImage(srcImg, 0, 0, w, h);
             const imgData = ctx.getImageData(0, 0, w, h);
             const data = imgData.data;
             const gray = new Float32Array(w * h);

@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.25</title>
+    <title>eStudio Lightbox - v0.27</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_v0.5.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_v0.5.svg" />
@@ -40,7 +40,7 @@
                 </svg>
             </div>
         </button>
-
+        <!-- Welcome Slate & Logo -->
         <div id="welcome-slate">
             <div class="hero-logo-container">
                 <img src="logo/estudio_lightbox_logo_v0.5.svg" alt="eStudio Lightbox App Icon" class="hero-app-logo" />
@@ -94,7 +94,7 @@
                             <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                             <span class="brand-lightbox">Lightbox</span>
                         </span>
-                        <span class="version-tag">v0.25</span>
+                        <span class="version-tag">v0.27</span>
                     </h3>
                 </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
@@ -602,6 +602,25 @@
             <svg viewBox="0 0 24 24">
                 <path
                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-15v14c3.86 0 7-3.14 7-7s-3.14-7-7-7z" />
+            </svg>
+        </button>
+
+        <button class="btn portrait-hide" id="btn-toolbar-rotate" title="Rotate 90°">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72.02-2.47zM6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47zm1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03L7.1 18.32zM13 4.07V1L8.45 5.55 13 10V6.09c3.37.5 6 3.41 6 6.91 0 1.28-.35 2.48-.96 3.52l1.46 1.46C20.43 16.38 21 14.76 21 13c0-4.63-3.52-8.43-8-8.93z" />
+            </svg>
+        </button>
+
+        <button class="btn portrait-hide" id="btn-toolbar-flip-x" title="Flip Horizontal">
+            <svg viewBox="0 0 24 24">
+                <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
+            </svg>
+        </button>
+
+        <button class="btn portrait-hide" id="btn-toolbar-flip-y" title="Flip Vertical">
+            <svg style="transform: rotate(90deg);" viewBox="0 0 24 24">
+                <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z" />
             </svg>
         </button>
 

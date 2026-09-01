@@ -1,0 +1,10 @@
+v0.26
+1) Honor x9e can see system notification icons, but only certain ones whilst in the app.
+2) guide-drawer-modal - both in portrait and landscape its getting cut off on the bottom. I though we fixed this so the grids adjust size dependent on the screen resolution so the drawer-modal always will be in view?
+3) Between the splash screen and the app loading there is a distinct jitter/jump in the screen.
+4) imported images. I cannot manipulate the imported images i.e pinch to zoom, rotate, flip etc 
+5) Hold 1s to unlock touch glow is a rectangle with squared off edges but I would like it to mimic the pill shape of the actual button please.
+
+
+
+
