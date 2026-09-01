@@ -1,4 +1,3 @@
-v0.32
 1) Studio guide - scrollable, can we make it that by scrolling anywhere on the studio guide modal that it will scroll and not just on the right hand edge please. also add the accent color to the scroll bar to make it stand out a little better.
 
 2) on android - save to collection - 2 vertical aligned capacitor 3 logos show only plus an ok button and nothing saves into my-collection

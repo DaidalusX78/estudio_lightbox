@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.32</title>
+    <title>eStudio Lightbox - v0.33</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_full_v0.6.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_full_v0.6.svg" />
@@ -96,7 +96,7 @@
                             <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                             <span class="brand-lightbox">Lightbox</span>
                         </span>
-                        <span class="version-tag">v0.32</span>
+                        <span class="version-tag">v0.33</span>
                     </h3>
                 </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
@@ -319,7 +319,7 @@
                     <span class="brand-title-wrap" style="font-size:16px;">
                         <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                         <span class="brand-lightbox">Lightbox</span>
-                        <span class="version-tag">v0.32</span>
+                        <span class="version-tag">v0.33</span>
                     </span>
                     <span class="guide-about-creator" data-i18n="about_creator">Created by Marc Bailey</span>
                 </div>
@@ -502,11 +502,18 @@
                 <span data-i18n="btn_camera">Camera</span>
             </button>
 
-            <button class="drawer-action-btn" id="btn-drawer-save">
+            <button class="drawer-action-btn" id="btn-drawer-save" title="Save Selected Image to Collection">
                 <svg viewBox="0 0 24 24">
                     <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z" />
                 </svg>
-                <span data-i18n="btn_save">Save to Collection</span>
+                <span data-i18n="btn_save_image">Save Image</span>
+            </button>
+
+            <button class="drawer-action-btn" id="btn-drawer-save-screen" title="Save Full Screen / Canvas to Collection">
+                <svg viewBox="0 0 24 24">
+                    <path d="M21 3H3c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5a2 2 0 0 0-2-2zm0 14H3V5h18v12z" />
+                </svg>
+                <span data-i18n="btn_save_screen">Save Screen</span>
             </button>
 
             <button class="drawer-action-btn portrait-only-drawer-item" id="btn-drawer-reset">

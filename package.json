@@ -1,6 +1,6 @@
 {
   "name": "estudio-lightbox",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "description": "eStudio Lightbox - Precision Tracing & Drafting Table",
   "main": "files/index.html",
   "scripts": {

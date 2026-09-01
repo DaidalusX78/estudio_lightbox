@@ -195,9 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 7. Collection Modal (IndexedDB)
+    // 7. Collection Modal (IndexedDB & LocalStorage)
     document.getElementById('btn-save-collection')?.addEventListener('click', () => StorageModule.saveCurrent());
     document.getElementById('btn-drawer-save')?.addEventListener('click', () => StorageModule.saveCurrent());
+    document.getElementById('btn-drawer-save-screen')?.addEventListener('click', () => StorageModule.saveScreen());
 
     document.getElementById('btn-open-collection')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -213,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.innerHTML = '';
         StorageModule.loadAll((items) => {
             if (!items || items.length === 0) {
-                grid.innerHTML = `<div class="empty-library-notice">${LocaleEngine.i18n[LocaleEngine.currentLang].msg_empty_collection}</div>`;
+                grid.innerHTML = `<div class="empty-library-notice">${LocaleEngine.i18n[LocaleEngine.currentLang]?.msg_empty_collection || 'No saved images in your collection yet.'}</div>`;
                 return;
             }
             items.reverse().forEach(item => {
@@ -232,7 +233,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 div.querySelector('.library-item-del').onclick = (ev) => {
                     ev.stopPropagation();
-                    StorageModule.deleteItem(item.id, () => document.getElementById('btn-open-collection')?.click());
+                    StorageModule.deleteItem(item.id, () => {
+                        div.style.transition = 'all 0.2s ease';
+                        div.style.transform = 'scale(0.8)';
+                        div.style.opacity = '0';
+                        setTimeout(() => {
+                            div.remove();
+                            if (grid.children.length === 0) {
+                                grid.innerHTML = `<div class="empty-library-notice">${LocaleEngine.i18n[LocaleEngine.currentLang]?.msg_empty_collection || 'No saved images in your collection yet.'}</div>`;
+                            }
+                        }, 200);
+                    });
                 };
                 grid.appendChild(div);
             });
@@ -240,9 +251,17 @@ document.addEventListener('DOMContentLoaded', () => {
         collectionModal.style.display = 'flex';
         syncToolbarPopupActiveStates();
     });
+
     document.getElementById('btn-close-collection')?.addEventListener('click', () => {
         if (collectionModal) collectionModal.style.display = 'none';
         syncToolbarPopupActiveStates();
+    });
+
+    collectionModal?.addEventListener('click', (e) => {
+        if (e.target === collectionModal) {
+            collectionModal.style.display = 'none';
+            syncToolbarPopupActiveStates();
+        }
     });
 
     const flashActionGlow = (...elements) => {

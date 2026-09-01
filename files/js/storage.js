@@ -102,7 +102,7 @@ const StorageModule = {
                     this.isSaving = false;
                     if (navigator.vibrate) navigator.vibrate(30);
                     if (typeof showToast === 'function') {
-                        showToast(LocaleEngine.i18n[LocaleEngine.currentLang]?.msg_saved_collection || 'Saved to My Collection!');
+                        showToast(LocaleEngine.i18n[LocaleEngine.currentLang]?.msg_saved_image || 'Saved Image to My Collection!');
                     }
                 };
                 req.onerror = (err) => {
@@ -139,6 +139,152 @@ const StorageModule = {
             } catch (e) {
                 this.isSaving = false;
                 this.saveFallback(saveData);
+            }
+        }
+    },
+
+    async saveScreen() {
+        if (this.isSaving) return;
+        if (!LayerManager.layers || LayerManager.layers.length === 0) {
+            if (typeof showToast === 'function') {
+                showToast(LocaleEngine.currentLang === 'es' ? 'No hay elementos en pantalla para guardar.' : 'No active images on screen to save.');
+            }
+            return;
+        }
+
+        this.isSaving = true;
+
+        try {
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = screenW;
+            offCanvas.height = screenH;
+            const ctx = offCanvas.getContext('2d');
+
+            // 1. Fill light table background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, screenW, screenH);
+
+            // 2. Render all visible layers from bottom to top
+            for (const layer of LayerManager.layers) {
+                const imgSource = layer.isStencil ? layer.canvasElem : (layer.rawImage?.width ? layer.rawImage : layer.imgElem);
+                if (!imgSource) continue;
+
+                const imgW = imgSource.naturalWidth || imgSource.width || 800;
+                const imgH = imgSource.naturalHeight || imgSource.height || 600;
+
+                ctx.save();
+                ctx.translate(screenW / 2 + layer.translateX, screenH / 2 + layer.translateY);
+                ctx.rotate((layer.rotation * Math.PI) / 180);
+                ctx.scale(layer.scale * layer.flipX, layer.scale * layer.flipY);
+
+                // Build filter string
+                let filterStr = `brightness(${Math.min(layer.brightness, 100)}%) `;
+                if (layer.brightness > 100) {
+                    filterStr += `brightness(${layer.brightness}%) saturate(${100 + (layer.brightness - 100) * 0.4}%) `;
+                }
+                if (layer.isInverted) filterStr += 'invert(100%) ';
+                if (layer.isContrast) filterStr += 'contrast(220%) ';
+                ctx.filter = filterStr.trim() || 'none';
+
+                ctx.drawImage(imgSource, -imgW / 2, -imgH / 2, imgW, imgH);
+                ctx.restore();
+            }
+
+            // 3. Render Custom Grid if active
+            if (FilterEngine.isGrid) {
+                ctx.save();
+                ctx.strokeStyle = FilterEngine.gridColor;
+                ctx.lineWidth = FilterEngine.gridLineWidth;
+                ctx.globalAlpha = 0.35;
+                ctx.beginPath();
+                const step = FilterEngine.gridSpacing;
+                for (let x = 0; x <= screenW; x += step) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, screenH);
+                }
+                for (let y = 0; y <= screenH; y += step) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(screenW, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 4. Render Warm Tint if active
+            if (FilterEngine.tintVal > 0) {
+                ctx.save();
+                ctx.fillStyle = `rgba(251, 146, 60, ${(FilterEngine.tintVal / 100) * 0.35})`;
+                ctx.fillRect(0, 0, screenW, screenH);
+                ctx.restore();
+            }
+
+            const dataUrl = offCanvas.toDataURL('image/png');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const screenName = `Screen (${timeStr})`;
+
+            const saveData = {
+                dataUrl: dataUrl,
+                name: screenName,
+                timestamp: Date.now(),
+                isScreenComposite: true
+            };
+
+            const doSave = (db) => {
+                try {
+                    const tx = db.transaction([this.STORE_NAME], 'readwrite');
+                    const store = tx.objectStore(this.STORE_NAME);
+                    const req = store.add(saveData);
+                    req.onsuccess = () => {
+                        this.isSaving = false;
+                        if (navigator.vibrate) navigator.vibrate(30);
+                        if (typeof showToast === 'function') {
+                            showToast(LocaleEngine.i18n[LocaleEngine.currentLang]?.msg_saved_screen || 'Saved Full Screen to My Collection!');
+                        }
+                    };
+                    req.onerror = (err) => {
+                        this.isSaving = false;
+                        console.error('Save error:', err);
+                        this.saveFallback(saveData);
+                    };
+                } catch (e) {
+                    this.isSaving = false;
+                    console.error('Transaction error:', e);
+                    this.saveFallback(saveData);
+                }
+            };
+
+            if (this.db) {
+                doSave(this.db);
+            } else {
+                try {
+                    const req = indexedDB.open(this.DB_NAME, 4);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+                            db.createObjectStore(this.STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                    req.onsuccess = (e) => {
+                        this.db = e.target.result;
+                        doSave(this.db);
+                    };
+                    req.onerror = () => {
+                        this.isSaving = false;
+                        this.saveFallback(saveData);
+                    };
+                } catch (e) {
+                    this.isSaving = false;
+                    this.saveFallback(saveData);
+                }
+            }
+        } catch (e) {
+            this.isSaving = false;
+            console.error('saveScreen error:', e);
+            if (typeof showToast === 'function') {
+                showToast(LocaleEngine.currentLang === 'es' ? 'Error al guardar la pantalla.' : 'Error saving full screen.');
             }
         }
     },
