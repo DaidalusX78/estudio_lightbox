@@ -17,7 +17,10 @@ buildscript {
 
 apply from: "variables.gradle"
 
+def buildBaseDir = new File(System.getProperty("user.home"), ".gradle-builds/eStudio-Lightbox")
+
 allprojects {
+    layout.buildDirectory = new File(buildBaseDir, project.name)
     repositories {
         google()
         mavenCentral()

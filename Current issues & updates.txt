@@ -2,20 +2,14 @@ v0.31
 1) 
 
 
-
-App icon edits
-
-1) Required  droid app edits: 
-Top (Core): #ffffff / #f3e5f5 | Thin stroke (~2px - 3.2px) | 100% Opacity — The hot center of the neon tube.
-Middle (Inner Glow): #d500f9 (Magenta/Purple) | Medium stroke (~5px - 6.5px / 12px) | Saturated bleeding gas color.
-Bottom (Outer Glow): #aa00ff (Deep Purple) | Thick stroke (~15px - 22px) | 50%–70% Opacity — Ambient glow.
-2) android app icon - neon e needs to be reduced in size.
-3) Opera logo dimensions look to be good to match.
-
-
 Splash Screen
 
 1) Logo looks to be a very low resolution quality .
+
+
+
+
+
 
 
 

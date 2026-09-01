@@ -172,35 +172,36 @@
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    padding: 8px 4px;
-    height: 66px;
-    min-height: 66px;
+    padding: 6px 2px;
+    height: auto;
+    min-height: 68px;
     width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
     color: var(--text-heading);
-    font-size: 10.5px;
-    line-height: 1.15;
+    font-size: 10px;
+    line-height: 1.1;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
     transition: all 0.15s ease;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .drawer-action-btn span {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
+    display: block;
+    white-space: normal;
+    overflow: visible;
+    word-break: normal;
+    overflow-wrap: break-word;
     max-width: 100%;
-    padding: 0 2px;
+    padding: 0 1px;
+    font-size: 9.5px;
+    line-height: 1.15;
 }
 
 .drawer-action-btn:hover {

@@ -17,16 +17,40 @@
     border-radius: 20px;
     max-width: 620px;
     width: 100%;
-    max-height: min(92dvh, calc(100dvh - 24px));
+    max-height: min(88vh, calc(100vh - 48px));
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     overscroll-behavior: contain;
-    padding: 20px;
+    padding: 20px 20px 28px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
     color: var(--text-primary);
     box-sizing: border-box;
     scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.04);
+}
+
+.guide-card-container::-webkit-scrollbar {
+    width: 6px;
+    display: block;
+}
+
+.guide-card-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 4px;
+    margin: 12px 0;
+}
+
+.guide-card-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.guide-card-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 
 .guide-drawer-header {
@@ -94,8 +118,8 @@
 @media (orientation: landscape) {
     .guide-card-container {
         max-width: min(840px, 96vw);
-        max-height: min(94dvh, calc(100dvh - 20px));
-        padding: 14px 18px;
+        max-height: min(88vh, calc(100vh - 36px));
+        padding: 14px 18px 24px 18px;
         gap: 10px;
     }
 
@@ -145,8 +169,8 @@
 @media (orientation: landscape) and (min-width: 900px) {
     .guide-card-container {
         max-width: min(920px, 94vw);
-        max-height: min(92dvh, calc(100dvh - 30px));
-        padding: 18px 22px;
+        max-height: min(88vh, calc(100vh - 40px));
+        padding: 18px 22px 28px 22px;
         gap: 12px;
     }
 

@@ -418,10 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-camera')?.click();
     });
 
-    document.getElementById('btn-drawer-fullscreen')?.addEventListener('click', () => {
-        document.getElementById('btn-fullscreen')?.click();
-    });
-
     document.getElementById('btn-drawer-reset')?.addEventListener('click', () => {
         document.getElementById('btn-reset')?.click();
     });
@@ -487,26 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const valElem = document.getElementById('tint-val');
         if (valElem) valElem.innerText = `${FilterEngine.tintVal}%`;
         FilterEngine.update();
-    });
-
-    // 12. Fullscreen API
-    const expandIconPath = "M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z";
-    const collapseIconPath = "M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z";
-
-    document.getElementById('btn-fullscreen')?.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(() => { });
-        } else {
-            document.exitFullscreen().catch(() => { });
-        }
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-        const isFullscreen = !!document.fullscreenElement;
-        if (fullscreenIcon) {
-            fullscreenIcon.innerHTML = `<path d="${isFullscreen ? collapseIconPath : expandIconPath}"/>`;
-        }
-        document.getElementById('btn-fullscreen')?.classList.toggle('active', isFullscreen);
     });
 
     // 13. Touch Lock Mode with Haptics

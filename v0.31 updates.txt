@@ -5,3 +5,21 @@ execute v0.31
 
 
 
+
+
+
+
+
+
+Android Studio Build
+
+[Incubating] Problems report is available at: file:///C:/Users/marcb/My%20Drive%20(marcjustinbailey@gmail.com)/Work%20Files/Games%20&%20Apps/eStudio%20Lightbox/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 20s
+68 actionable tasks: 51 executed, 17 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.0/userguide/configuration_cache_enabling.html
+
+Build Analyzer results available
+
+
+
