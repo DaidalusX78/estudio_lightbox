@@ -11,3 +11,11 @@ $RECYCLE.BIN/
 
 # Scratch scripts
 scratch/
+
+# Node dependencies & Android build outputs
+node_modules/
+android/app/build/
+android/.gradle/
+android/build/
+.gradle/
+

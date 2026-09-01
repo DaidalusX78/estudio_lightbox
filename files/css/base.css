@@ -179,9 +179,11 @@ body.dark-mode {
         filter: brightness(0.5) saturate(0.6);
         transform: scale(0.98);
     }
+
     60% {
         filter: brightness(1.1) saturate(1.05);
     }
+
     100% {
         opacity: 1;
         filter: brightness(1) saturate(1);
@@ -270,12 +272,12 @@ body.dark-mode .brand-title-wrap {
 #welcome-slate p.byline {
     font-size: clamp(20px, 3.2vw, 26px);
     font-weight: 400;
-    color: var(--accent);
+    color: var(--dark);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding-top: 14px;
+    padding-top: 25px;
     margin-top: 4px;
     letter-spacing: 0.01em;
 }
@@ -292,7 +294,7 @@ body.dark-mode #welcome-slate p.byline {
     height: 32px;
     border-radius: 8px;
     background: rgba(56, 189, 248, 0.16);
-    color: var(--accent);
+    color: var(--text-dark);
     padding: 4px;
     vertical-align: middle;
 }

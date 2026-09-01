@@ -1,0 +1,14 @@
+{
+  "appId": "com.estudio.lightbox",
+  "appName": "eStudio Lightbox",
+  "webDir": "files",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "backgroundColor": "#09090b"
+  }
+}
