@@ -308,3 +308,42 @@ body.dark-mode #welcome-slate p.byline {
 #file-input {
     display: none;
 }
+
+/* Tablet Optimization: Reduce welcome-slate by 50% */
+@media (min-width: 600px) and (min-height: 541px) {
+    #welcome-slate {
+        gap: 8px;
+    }
+
+    .hero-app-logo {
+        width: 150px;
+        height: 150px;
+        max-width: 35vw;
+        max-height: 25vh;
+    }
+
+    .brand-title-wrap {
+        font-size: 24px;
+    }
+
+    .version-tag {
+        font-size: 11px;
+    }
+
+    #welcome-slate p.byline {
+        font-size: 13px;
+        padding-top: 10px;
+        gap: 6px;
+    }
+
+    .byline-icon-svg {
+        width: 20px;
+        height: 20px;
+        padding: 2px;
+    }
+
+    .byline-icon-svg svg {
+        width: 14px;
+        height: 14px;
+    }
+}

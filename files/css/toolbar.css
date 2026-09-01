@@ -266,7 +266,7 @@
 }
 
 /* --- Responsive Viewport & Device Adaptations --- */
-@media (orientation: portrait) {
+@media (orientation: portrait) and (max-width: 599px) {
     .portrait-hide {
         display: none !important;
     }
