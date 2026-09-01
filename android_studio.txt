@@ -1,2 +1,9 @@
 Build via Android Studio:
 You can run npm run open to open the project directly in Android Studio. Android Studio manages its own daemon and file-handles more gracefully.
+
+
+
+
+
+
+Tip for future changes: Whenever you edit HTML, CSS, or JS files, run npm run sync (or npx cap sync) in your terminal to push the latest files over to Android Studio.

@@ -41,6 +41,19 @@ function closeVideoModal() {
     modal.style.display = 'none';
 }
 
+// Global Toast Notification Helper
+window.showToast = function (message) {
+    const toast = document.getElementById('app-toast');
+    const toastText = document.getElementById('app-toast-text');
+    if (!toast || !toastText) return;
+    toastText.textContent = message;
+    toast.classList.add('show');
+    if (window._toastTimeout) clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2400);
+};
+
 // Clipboard Paste
 async function pasteFromClipboard() {
     try {
@@ -53,9 +66,9 @@ async function pasteFromClipboard() {
                 return;
             }
         }
-        alert(LocaleEngine.currentLang === 'es' ? "No se encontró ninguna imagen en el portapapeles." : "No image found on clipboard.");
+        showToast(LocaleEngine.currentLang === 'es' ? "No se encontró ninguna imagen en el portapapeles." : "No image found on clipboard.");
     } catch (err) {
-        alert(LocaleEngine.currentLang === 'es' ? "Por favor concede permiso de portapapeles o usa Ctrl+V." : "Please grant clipboard permission or use Ctrl+V.");
+        showToast(LocaleEngine.currentLang === 'es' ? "Por favor concede permiso de portapapeles o usa Ctrl+V." : "Please grant clipboard permission or use Ctrl+V.");
     }
 }
 
@@ -287,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!active) return;
         LayerManager.recordHistory('invert');
         active.isInverted = !active.isInverted;
-        document.body.classList.toggle('dark-mode', active.isInverted);
         document.getElementById('btn-invert')?.classList.toggle('active', !!active.isInverted);
         document.getElementById('btn-drawer-invert')?.classList.toggle('active', !!active.isInverted);
         FilterEngine.update();

@@ -266,17 +266,48 @@
 }
 
 /* --- Responsive Viewport & Device Adaptations --- */
-@media (orientation: portrait) and (max-width: 599px) {
+
+/* 1. All Portrait Orientations (Phones, Small Tablets e.g. iPad Air, Honor Pad X9, Large Tablets) */
+@media (orientation: portrait) {
     .portrait-hide {
         display: none !important;
     }
 
     #toolbar {
         bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 16px)));
+        padding: 6px 14px;
+        gap: 6px;
+        max-width: calc(100vw - 16px);
+        justify-content: center;
+    }
+}
+
+/* Tablet Portrait (600px - 1024px) */
+@media (orientation: portrait) and (min-width: 600px) {
+    #toolbar {
+        bottom: max(28px, calc(20px + env(safe-area-inset-bottom, 20px)));
+        padding: 6px 16px;
+        gap: 8px;
+    }
+
+    .btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .btn svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+/* Phone Portrait (<= 599px) */
+@media (orientation: portrait) and (max-width: 599px) {
+    #toolbar {
+        bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 16px)));
         padding: 5px 12px;
         gap: 4px;
         max-width: calc(100vw - 16px);
-        justify-content: center;
     }
 
     .btn {
@@ -306,13 +337,12 @@
 }
 
 /* Extra compact optimization for phones <= 420px (Pixel 8, iPhone standard, Galaxy) */
-@media (max-width: 420px) and (orientation: portrait) {
+@media (orientation: portrait) and (max-width: 420px) {
     #toolbar {
         bottom: max(22px, calc(14px + env(safe-area-inset-bottom, 14px)));
-        padding: 5px 12px;
+        padding: 5px 10px;
         gap: 3.5px;
         max-width: calc(100vw - 12px);
-        justify-content: center;
     }
 
     .btn {
@@ -340,22 +370,77 @@
     }
 }
 
-@media (max-height: 540px) {
+/* 2. Landscape Viewports - Small to Mid Tablets & Split Views (640px to 959px) */
+@media (orientation: landscape) and (max-width: 959px) and (min-width: 640px) {
     #toolbar {
-        bottom: max(16px, calc(8px + env(safe-area-inset-bottom, 12px)));
-        padding: 4px 8px;
-        gap: 5px;
+        gap: 4px;
+        padding: 5px 10px;
         max-width: calc(100vw - 16px);
     }
 
     .btn {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
     }
 
     .btn svg {
-        width: 20px;
-        height: 20px;
+        width: 19px;
+        height: 19px;
+    }
+
+    #btn-help {
+        font-size: 15px;
+    }
+}
+
+/* Compact Landscape & Mobile Landscape (<= 639px wide) */
+@media (orientation: landscape) and (max-width: 639px) {
+    .portrait-hide {
+        display: none !important;
+    }
+
+    #toolbar {
+        padding: 4px 8px;
+        gap: 4px;
+        max-width: calc(100vw - 12px);
+    }
+
+    .btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .btn svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    #btn-help {
+        font-size: 14px;
+    }
+}
+
+/* Short screens (e.g. phones in landscape, max-height <= 540px) */
+@media (max-height: 540px) {
+    #toolbar {
+        bottom: max(16px, calc(8px + env(safe-area-inset-bottom, 12px)));
+        padding: 4px 8px;
+        gap: 3.5px;
+        max-width: calc(100vw - 16px);
+    }
+
+    .btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    #btn-help {
+        font-size: 14px;
     }
 
     #welcome-slate {

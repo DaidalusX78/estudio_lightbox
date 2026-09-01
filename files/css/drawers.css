@@ -66,11 +66,13 @@
     text-align: right;
     padding: 2px 0;
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .input-val-wrap input[type="number"]::-webkit-outer-spin-button,
 .input-val-wrap input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
@@ -267,7 +269,42 @@
     color: #000000;
 }
 
-/* --- Live Camera Shutter & Capture Flash --- */
+/* --- Live Camera Shutter, Close & Capture Flash --- */
+#btn-camera-close {
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top, 20px));
+    right: max(20px, env(safe-area-inset-right, 20px));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(18, 18, 18, 0.88);
+    border: 1.5px solid var(--border);
+    color: var(--text-heading);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    z-index: 130;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    transition: all 0.15s ease;
+    outline: none;
+}
+
+#btn-camera-close:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: var(--danger);
+    color: var(--danger);
+    transform: scale(1.08);
+}
+
+#btn-camera-close:active {
+    transform: scale(0.92);
+}
+
 #btn-camera-shutter {
     position: fixed;
     bottom: 84px;

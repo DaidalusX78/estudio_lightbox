@@ -20,7 +20,7 @@ const GestureEngine = {
 
         viewport.addEventListener('pointerdown', (e) => {
             if (this.isLocked) return;
-            if (e.target.closest('#toolbar, #layer-selector-bar, .modal, .slider-popup, .drawer, #btn-camera-shutter, #ruler-overlay, .library-modal')) {
+            if (e.target.closest('#toolbar, #layer-selector-bar, .modal, .slider-popup, .drawer, #btn-camera-shutter, #btn-camera-close, #ruler-overlay, .library-modal')) {
                 return;
             }
 
@@ -182,7 +182,7 @@ const GestureEngine = {
         let lastTap = 0;
         viewport.addEventListener('click', (e) => {
             if (this.isLocked) return;
-            if (e.target.closest('#btn-camera-shutter') || e.target.closest('#toolbar') || e.target.closest('#layer-selector-bar')) return;
+            if (e.target.closest('#btn-camera-shutter') || e.target.closest('#btn-camera-close') || e.target.closest('#toolbar') || e.target.closest('#layer-selector-bar')) return;
             const now = Date.now();
             if (now - lastTap < 300) this.toggleQuickFit();
             lastTap = now;

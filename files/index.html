@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="eStudio Lightbox - Precision Tracing & Drafting Table" />
-    <title>eStudio Lightbox - v0.31</title>
+    <title>eStudio Lightbox - v0.32</title>
 
     <link rel="icon" type="image/svg+xml" href="logo/estudio_lightbox_logo_full_v0.6.svg" />
     <link rel="apple-touch-icon" href="logo/estudio_lightbox_logo_full_v0.6.svg" />
@@ -32,6 +32,7 @@
         <div id="drag-overlay"></div>
         <div id="camera-flash"></div>
         <video id="camera-feed" autoplay playsinline muted></video>
+        <button id="btn-camera-close" title="Close Camera" aria-label="Close Camera">✕</button>
         <button id="btn-camera-shutter" title="Take Photo" aria-label="Take Photo">
             <div class="shutter-inner">
                 <svg viewBox="0 0 24 24">
@@ -95,7 +96,7 @@
                             <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                             <span class="brand-lightbox">Lightbox</span>
                         </span>
-                        <span class="version-tag">v0.31</span>
+                        <span class="version-tag">v0.32</span>
                     </h3>
                 </div>
                 <button class="btn-cancel" id="btn-close-guide" style="padding:6px 12px;">✕</button>
@@ -318,7 +319,7 @@
                     <span class="brand-title-wrap" style="font-size:16px;">
                         <span class="brand-studio"><span class="brand-e">e</span>Studio</span>
                         <span class="brand-lightbox">Lightbox</span>
-                        <span class="version-tag">v0.31</span>
+                        <span class="version-tag">v0.32</span>
                     </span>
                     <span class="guide-about-creator" data-i18n="about_creator">Created by Marc Bailey</span>
                 </div>
@@ -698,6 +699,11 @@
                 </video>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="app-toast">
+        <span id="app-toast-text"></span>
     </div>
 
     <!-- Modular JavaScript Architecture -->
