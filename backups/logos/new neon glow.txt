@@ -1,8 +1,0 @@
-Bottom:  Color: #aa00ffff width: 22px  Blur 34.4 Opacity 45
-Middle:  Color: #aa00ffff width: 22px  Blur 3.6  Opacity 20
-Middle:  Color: #d500f9ff width: 12px  Blur 22.7 Opacity 80
-Middle:  Color: #e040fbff width: 6.5px Blur 13.6 Opacity 100
-Top:     Color: #ffffffff width: 3.2px Blur 0    Opacity 100
-
-
-

@@ -20,3 +20,11 @@ android/build/
 # IDE
 .idea/
 android/.idea/
+
+# Local Notes & Documentation
+TODOLIST.md
+todolist.md
+android_studio.md
+
+# Backups & Local Archives
+backups/

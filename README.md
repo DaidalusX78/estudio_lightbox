@@ -1,5 +1,7 @@
 # eStudio Lightbox (v0.33)
 
+> **Created by Marc Bailey**
+
 A dedicated, precision digital tracing and light table application designed to help artists, calligraphers, illustrators, and learners draw and trace references effortlessly.
 
 ---
@@ -51,3 +53,9 @@ npm run build:apk
 ```
 *Generated Debug APK will be located at:*
 `android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## 👨‍💻 Credits
+Created by **Marc Bailey**
+

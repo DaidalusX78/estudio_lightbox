@@ -1,6 +1,0 @@
-v0.33
-1) My collection modal - in-place delete without closing modal, backdrop click to close
-2) Save to Collection split into Save Image & Save Screen buttons
-3) Full screen canvas composition rendering to My Collection
-
-Android Studio Build
